@@ -1,0 +1,222 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Docker · Tutoriais</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="# Docker"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Docker · Tutoriais"/><meta property="og:type" content="website"/><meta property="og:url" content="https://guilhermegarcia86.github.io/blog-guilherme/blog/2020/04/10/post-docker"/><meta property="og:description" content="# Docker"/><meta property="og:image" content="https://guilhermegarcia86.github.io/blog-guilherme/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://guilhermegarcia86.github.io/blog-guilherme/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/blog-guilherme/img/favicon.ico"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><link rel="alternate" type="application/atom+xml" href="https://guilhermegarcia86.github.io/blog-guilherme/blog/atom.xml" title="Tutoriais Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://guilhermegarcia86.github.io/blog-guilherme/blog/feed.xml" title="Tutoriais Blog RSS Feed"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/blog-guilherme/js/scrollSpy.js"></script><link rel="stylesheet" href="/blog-guilherme/css/main.css"/><script src="/blog-guilherme/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/blog-guilherme/"><img class="logo" src="/blog-guilherme/img/favicon.ico" alt="Tutoriais"/><h2 class="headerTitleWithLogo">Tutoriais</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/blog-guilherme/docs/doc4" target="_self">Apostilas</a></li><li class="siteNavGroupActive"><a href="/blog-guilherme/blog/" target="_self">Blog</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Recent Posts</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Recent Posts</h3><ul class=""><li class="navListItem"><a class="navItem" href="/blog-guilherme/blog/2020/04/20/post-kubernetes">Kubernetes</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/blog-guilherme/blog/2020/04/10/post-docker">Docker</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer postContainer blogContainer"><div class="wrapper"><div class="lonePost"><div class="post"><header class="postHeader"><h1 class="postHeaderTitle"><a href="/blog-guilherme/blog/2020/04/10/post-docker">Docker</a></h1><p class="post-meta">April 10, 2020</p><div class="authorBlock"><p class="post-authorName"><a href="https://twitter.com/guilherme_ga86" target="_blank" rel="noreferrer noopener">Guilherme Alves</a></p><div class="authorPhoto"><a href="https://twitter.com/guilherme_ga86" target="_blank" rel="noreferrer noopener"><img src="https://graph.facebook.com/1426803577/picture/?height=200&amp;width=200" alt="Guilherme Alves"/></a></div></div></header><div><span><h1><a class="anchor" aria-hidden="true" id="docker"></a><a href="#docker" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Docker</h1>
+<p><strong>O que é?</strong></p>
+<p>Tecnologia utilizada para baratear o custo de hospedar várias aplicações em uma mesma máquina.</p>
+<p><strong>Diferença entre entre Dokcer e VM.</strong></p>
+<p>Virtualização é a tecnologia que virtualiza os drivers do pc o que se torna várias máquinas rodando em uma unica máquina.</p>
+<p>Melhor aproveitamento dos recursos do servidor.</p>
+<p>Problemas da virtualização, cada aplicação com um sistema operacional por VM e isso é custoso tanto na configuração quanto no consumo de hardwares.</p>
+<p>Containers são lugares onde a aplicação ira ser executada e eles rodarão sobre o sistema operacional do servidor. É mais leve pois só tem o SO do servidor e eles compartilham os recursos do SO.</p>
+<p>Um <strong><em>container</em></strong> funcionará junto do nosso sistema operacional base, e conterá a nossa aplicação, ou seja, a aplicação será executada dentro dele. Criamos um <em>container</em> para cada aplicação, e esses <em>containers</em> vão <strong>dividir</strong> as funcionalidades do sistema operacional.</p>
+<p>Com os <em>containers</em>, conseguimos limitar o consumo de CPU das aplicações, melhorando o controle sobre o uso de cada recurso do nosso sistema (CPU, rede, etc). Também temos uma facilidade maior em trabalhar com versões específicas de linguagens/bibliotecas, além de ter uma agilidade maior na hora de criar e subir <em>containers</em>, já que eles são mais leves que as máquinas virtuais.</p>
+<p><strong>Instalação</strong></p>
+<p><a href="https://www.digitalocean.com/community/tutorials/como-instalar-e-usar-o-docker-no-ubuntu-18-04-pt">Linux</a></p>
+<p><strong>Layered File System</strong></p>
+<p>Imagens com várias camadas. Camadas podem ser compartilhadas e são somente read only. Podem ser aproveitadas por vários containers</p>
+<p><strong>Volumes</strong></p>
+<p>O volume fica no <em>Docker Host</em>. Ou seja, fica salvo no computador onde a <em>Docker Engine</em> está rodando.</p>
+<p>Persistir dados com containers, pois os containers são voláteis.</p>
+<p>Exemplo:</p>
+<pre><code class="hljs">docker <span class="hljs-keyword">run</span><span class="bash"> -v <span class="hljs-string">"C:\Users\develop:/var/www"</span> ubuntu</span>
+</code></pre>
+<p>O parâmetro <em>-v</em> (volume) primeira parte é o caminho na sua máquina e o segundo é o caminho no container</p>
+<p>Mesmo após o container ser removido os dados desse path não serão destruídos juntos.</p>
+<p>Exemplo executando um código salvo em uma pasta em um container:</p>
+<pre><code class="hljs">docker run -p <span class="hljs-number">8080</span>:<span class="hljs-number">3000</span> -v <span class="hljs-string">"C:\Users\develop\repo\volume-exemplo:/var/www"</span> -w <span class="hljs-string">"/var/www"</span> <span class="hljs-keyword">node</span> <span class="hljs-title">npm</span> <span class="hljs-literal">start</span>
+</code></pre>
+<p><em>-w</em> working directory aponta onde, qual pasta ou path, o container deve iniciar</p>
+<p><strong>Criando imagens personalizadas usando Dockerfile</strong></p>
+<p><strong>FROM</strong> comando pra aproveitar imagem base</p>
+<p><strong>MAINTAINER</strong> pessoa responsavel</p>
+<p><strong>ENV</strong> variaveis de ambiente</p>
+<p><strong>COPY</strong> copia pra dentro da imagem</p>
+<p><strong>WORKDIR</strong> assim que o container carregar no caminho especificado</p>
+<p><strong>RUN</strong> comando que roda enquanto está construindo a imagem</p>
+<p><strong>ENTRYPOINT</strong> comando que será executado assim que terminar de construir o container</p>
+<p><strong>EXPOSE</strong> porta que será aberta</p>
+<p>Exemplo:</p>
+<pre><code class="hljs"><span class="hljs-keyword">FROM</span> node:latest
+
+MAINTANER Guilherme Alves
+
+<span class="hljs-keyword">ENV</span> PORT=<span class="hljs-number">3000</span>
+
+<span class="hljs-keyword">COPY</span><span class="bash"> . /var/www</span>
+
+<span class="hljs-keyword">WORKDIR</span><span class="bash"> /var/www</span>
+
+<span class="hljs-keyword">RUN</span><span class="bash"> npm install</span>
+
+<span class="hljs-keyword">ENTRYPOINT</span><span class="bash"> npm start</span>
+
+<span class="hljs-keyword">EXPOSE</span> $PORT
+</code></pre>
+<pre><code class="hljs">docker build -f <span class="hljs-tag">&lt;<span class="hljs-name">nome</span> <span class="hljs-attr">do</span> <span class="hljs-attr">arquivo</span>&gt;</span> -t <span class="hljs-tag">&lt;<span class="hljs-name">tag</span>&gt;</span> . <span class="hljs-tag">&lt;<span class="hljs-name">contexto</span>&gt;</span>
+
+docker run -d -p 8080:3000 <span class="hljs-tag">&lt;<span class="hljs-name">tag</span>&gt;</span>
+</code></pre>
+<p><strong>Subir para dockerhub</strong></p>
+<p>docker login</p>
+<p>docker push <tag></p>
+<p><strong>Network</strong></p>
+<p>Comunicando vários containers.</p>
+<p>Na rede default eles se comunicam apenas por IP</p>
+<p>Comando para criar sua própria rede:</p>
+<pre><code class="hljs">docker<span class="hljs-built_in"> network </span>create --driver<span class="hljs-built_in"> bridge </span>&lt;nome-da-rede&gt;
+</code></pre>
+<p>Existem outros drivers mas o mais comum é o <strong><em>bridge</em></strong></p>
+<p>Atrelar o contêiner na rede criada:</p>
+<pre><code class="hljs">docker run --name <span class="hljs-tag">&lt;<span class="hljs-name">nome-do-container</span>&gt;</span> --netowrk <span class="hljs-tag">&lt;<span class="hljs-name">nome-da-rede</span>&gt;</span> <span class="hljs-tag">&lt;<span class="hljs-name">imagem</span>&gt;</span>
+</code></pre>
+<p>Com isso conseguimos nos comunicar entre os contêiner pelo nome.</p>
+<p><strong>Docker Compose</strong></p>
+<p>Ferramenta para facilitar, automatizar e prever falhas para comunicação entre containers.</p>
+<p>Todo o processo é escrito em um arquivo chamado <strong>docker-compose.yml</strong></p>
+<p><strong>Instalação</strong></p>
+<p><a href="https://docs.docker.com/compose/install/">Docker Compose Install Documentation</a></p>
+<p>Exemplo de uma aplicação com um banco de dados <strong>MySQL</strong>, uma aplicação <strong>NodeJS</strong> e um Load Balance com <strong>NGINX</strong></p>
+<pre><code class="hljs"><span class="hljs-symbol">version:</span> <span class="hljs-string">'3'</span> <span class="hljs-comment">//versão do docker compose</span>
+<span class="hljs-symbol">services:</span> <span class="hljs-comment">//nome dos serviços que vão ser rodados</span>
+<span class="hljs-symbol">  nginx:</span> <span class="hljs-comment">// aqui é feita a condfiguração do NGINX que é um container que possui um Dokcerfile</span>
+<span class="hljs-symbol">    build:</span>
+<span class="hljs-symbol">      dockerfile:</span> .<span class="hljs-meta-keyword">/docker/</span>nginx.dockerfile <span class="hljs-comment">//dizemos onde está o arquivos Dockerfile que deve ser buildado</span>
+<span class="hljs-symbol">      context:</span> . <span class="hljs-comment">//a partir de onde ele tem que buscar</span>
+<span class="hljs-symbol">    image:</span> <span class="hljs-params">&lt;nome-da-imagem&gt;</span> <span class="hljs-comment">//nome da imagem</span>
+<span class="hljs-symbol">    container_name:</span> nginx <span class="hljs-comment">//nome pro container</span>
+<span class="hljs-symbol">    ports:</span> <span class="hljs-comment">//mapear as portas que serão expostas</span>
+      - <span class="hljs-string">"80:80"</span> <span class="hljs-comment">//porta de fora:porta de dentro</span>
+<span class="hljs-symbol">    networks:</span>
+      - production-network <span class="hljs-comment">//nome da network criada abaixo</span>
+<span class="hljs-symbol">    depends_on:</span>
+      - <span class="hljs-string">"node"</span> <span class="hljs-comment">//o nginx só sobe depois que o node subir</span>
+<span class="hljs-symbol">  mongodb:</span>
+<span class="hljs-symbol">    image:</span> mongo <span class="hljs-comment">//imagem padrão</span>
+<span class="hljs-symbol">    networks:</span>
+      - production-network
+<span class="hljs-symbol">  node:</span>
+<span class="hljs-symbol">    build:</span>
+<span class="hljs-symbol">      dockerfile:</span> <span class="hljs-comment">//path de onde está o Dockerfile</span>
+<span class="hljs-symbol">      context:</span> . <span class="hljs-comment">//a partir de onde procurar o Dockerfile</span>
+<span class="hljs-symbol">    image:</span> <span class="hljs-comment">//nome da imagem</span>
+<span class="hljs-symbol">    container_name:</span> <span class="hljs-comment">//nome dado ao container</span>
+<span class="hljs-symbol">    ports:</span>
+      - <span class="hljs-string">"3000"</span>
+<span class="hljs-symbol">    networks:</span>
+      - production-network
+<span class="hljs-symbol">    depends_on:</span>
+      - <span class="hljs-string">"mongo"</span> <span class="hljs-comment">//indica que o node só vai subir depois que o mongo subir</span>
+<span class="hljs-symbol">networks:</span> <span class="hljs-comment">//criando a rede pra comunicação dos containers</span>
+  production-network: <span class="hljs-comment">//nome que você quiser</span>
+<span class="hljs-symbol">    driver:</span> bridge
+
+</code></pre>
+<p>Executando:</p>
+<pre><code class="hljs">docker-compose build <span class="hljs-comment">//buildar imagens</span>
+
+docker-compose up -d <span class="hljs-comment">//subir containers a partir do compose</span>
+
+docker-compose ps <span class="hljs-comment">//lista todos</span>
+
+docker-compose down <span class="hljs-comment">//terminar todos os containers</span>
+
+docker-compose restart <span class="hljs-comment">//restarta os containers</span>
+</code></pre>
+<p><strong>Instalando Docker Compose</strong></p>
+<p>sudo curl -L <a href="https://github.com/docker/compose/releases/download/1.15.0/docker-compose-">https://github.com/docker/compose/releases/download/1.15.0/docker-compose-</a><code>uname -s</code>-<code>uname -m</code> -o /usr/local/bin/docker-compose</p>
+<pre><code class="hljs">sudo chmod +x <span class="hljs-regexp">/usr/</span>local<span class="hljs-regexp">/bin/</span>docker-compose
+</code></pre>
+<p><strong>Comandos Básicos</strong></p>
+<ul>
+<li><p>Comandos relacionados às informações</p></li>
+<li><p>docker version <strong>-</strong> exibe a versão do docker que está instalada.</p></li>
+<li><p>docker inspect ID_CONTAINER <strong>-</strong> retorna diversas informações sobre o container.</p></li>
+<li><p>docker ps <strong>-</strong> exibe todos os containers em execução no momento.</p></li>
+<li><p>docker ps -a <strong>-</strong> exibe todos os containers, independentemente de estarem em execução ou não.</p></li>
+<li><p>Comandos relacionados à execução</p></li>
+<li><p>docker run NOME_DA_IMAGEM <strong>-</strong> cria um container com a respectiva imagem passada como parâmetro.</p></li>
+<li><p>docker run -it NOME_DA_IMAGEM <strong>-</strong> conecta o terminal que estamos utilizando com o do container.</p></li>
+<li><p>docker run -d -P --name NOME dockersamples/static-site <strong>-</strong> ao executar, dá um nome ao container.</p></li>
+<li><p>docker run -d -p 12345:80 dockersamples/static-site <strong>-</strong> define uma porta específica para ser atribuída à porta 80 do container, neste caso 12345.</p></li>
+<li><p>docker run -v &quot;CAMINHO_VOLUME&quot; NOME_DA_IMAGEM <strong>-</strong> cria um volume no respectivo caminho do container.</p></li>
+<li><p>docker run -it --name NOME_CONTAINER --network NOME_DA_REDE NOME_IMAGEM <strong>-</strong> cria um container especificando seu nome e qual rede deverá ser usada.</p></li>
+<li><p>Comandos relacionados à inicialização/interrupção</p></li>
+<li><p>docker start ID_CONTAINER <strong>-</strong> inicia o container com id em questão.</p></li>
+<li><p>docker start -a -i ID_CONTAINER <strong>-</strong> inicia o container com id em questão e integra os terminais, além de permitir interação entre ambos.</p></li>
+<li><p>docker stop ID_CONTAINER <strong>-</strong> interrompe o container com id em questão.</p></li>
+<li><p>Comandos relacionados à remoção</p></li>
+<li><p>docker rm ID_CONTAINER <strong>-</strong> remove o container com id em questão.</p></li>
+<li><p>docker container prune <strong>-</strong> remove todos os containers que estão parados.</p></li>
+<li><p>docker rmi NOME_DA_IMAGEM <strong>-</strong> remove a imagem passada como parâmetro.</p></li>
+<li><p>Comandos relacionados à construção de Dockerfile</p></li>
+<li><p>docker build -f Dockerfile <strong>-</strong> cria uma imagem a partir de um Dockerfile.</p></li>
+<li><p>docker build -f Dockerfile -t NOME_USUARIO/NOME_IMAGEM <strong>-</strong> constrói e nomeia uma imagem não-oficial.</p></li>
+<li><p>docker build -f Dockerfile -t NOME_USUARIO/NOME_IMAGEM CAMINHO_DOCKERFILE <strong>-</strong> constrói e nomeia uma imagem não-oficial informando o caminho para o Dockerfile.</p></li>
+<li><p>Comandos relacionados ao Docker Hub</p></li>
+<li><p>docker login <strong>-</strong> inicia o processo de login no Docker Hub.</p></li>
+<li><p>docker push NOME_USUARIO/NOME_IMAGEM <strong>-</strong> envia a imagem criada para o Docker Hub.</p></li>
+<li><p>docker pull NOME_USUARIO/NOME_IMAGEM <strong>-</strong> baixa a imagem desejada do Docker Hub.</p></li>
+<li><p>Comandos relacionados à rede</p></li>
+<li><p>hostname -i <strong>-</strong> mostra o ip atribuído ao container pelo docker (funciona apenas dentro do container).</p></li>
+<li><p>docker network create --driver bridge NOME_DA_REDE <strong>-</strong> cria uma rede especificando o driver desejado.</p></li>
+<li><p>Comandos relacionados ao docker-compose</p></li>
+<li><p>docker-compose build <strong>-</strong> Realiza o build dos serviços relacionados ao arquivo docker-compose.yml, assim como verifica a sua sintaxe.</p></li>
+<li><p>docker-compose up <strong>-</strong> Sobe todos os containers relacionados ao docker-compose, desde que o build já tenha sido executado.</p></li>
+<li><p>docker-compose down <strong>-</strong> Para todos os serviços em execução que estejam relacionados ao arquivo docker-compose.yml.</p></li>
+</ul>
+</span></div></div><div class="blogSocialSection"><div class="blogSocialSectionItem"><a href="https://twitter.com/share" class="twitter-share-button" data-text="Docker" data-url="https://guilhermegarcia86.github.io/blog-guilherme/blog/2020/04/10/post-docker" data-related="true" data-via="guilherme_ga86" data-show-count="false">Tweet</a></div><div class="blogSocialSectionItem"><div class="fb-like" data-href="https://guilhermegarcia86.github.io/blog-guilherme/blog/2020/04/10/post-docker" data-layout="standard" data-share="true" data-width="225" data-show-faces="false"></div></div><div class="blogSocialSectionItem"><div class="fb-comments" data-href="https://guilhermegarcia86.github.io/blog-guilherme/blog/2020/04/10/post-docker" data-width="100%" data-numposts="5" data-order-by="time"></div></div></div></div><div class="blog-recent"><a class="button" href="/blog-guilherme/blog/">Recent Posts</a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/blog-guilherme/" class="nav-home"><img src="/blog-guilherme/img/favicon.ico" alt="Tutoriais" width="66" height="58"/></a><div><h5>Docs</h5><a href="/blog-guilherme/docs/en/doc1.html">Getting Started (or other categories)</a><a href="/blog-guilherme/docs/en/doc2.html">Guides (or other categories)</a><a href="/blog-guilherme/docs/en/doc3.html">API Reference (or other categories)</a></div><div><h5>Community</h5><a href="/blog-guilherme/en/users.html">User Showcase</a><a href="https://stackoverflow.com/questions/tagged/" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://discordapp.com/">Project Chat</a><a href="https://twitter.com/" target="_blank" rel="noreferrer noopener">Twitter</a></div><div><h5>More</h5><a href="/blog-guilherme/blog">Blog</a><a href="https://github.com/">GitHub</a><a class="github-button" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a><div class="social"><div class="fb-like" data-href="https://guilhermegarcia86.github.io" data-colorscheme="dark" data-layout="standard" data-share="true" data-width="225" data-show-faces="false"></div></div></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/blog-guilherme/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2020</section></footer></div><script>window.fbAsyncInit = function() {FB.init({appId:'524104774884756',xfbml:true,version:'v2.7'});};(function(d, s, id){var js, fjs = d.getElementsByTagName(s)[0];if (d.getElementById(id)) {return;}js = d.createElement(s); js.id = id;js.src = '//connect.facebook.net/en_US/sdk.js';fjs.parentNode.insertBefore(js, fjs);}(document, 'script','facebook-jssdk'));
+                </script><script>window.twttr=(function(d,s, id){var js,fjs=d.getElementsByTagName(s)[0],t=window.twttr||{};if(d.getElementById(id))return t;js=d.createElement(s);js.id=id;js.src='https://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js, fjs);t._e = [];t.ready = function(f) {t._e.push(f);};return t;}(document, 'script', 'twitter-wjs'));</script></body></html>

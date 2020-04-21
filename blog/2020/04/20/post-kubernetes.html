@@ -1,0 +1,422 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Kubernetes · Tutoriais</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="# Kubernetes"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Kubernetes · Tutoriais"/><meta property="og:type" content="website"/><meta property="og:url" content="https://guilhermegarcia86.github.io/blog-guilherme/blog/2020/04/20/post-kubernetes"/><meta property="og:description" content="# Kubernetes"/><meta property="og:image" content="https://guilhermegarcia86.github.io/blog-guilherme/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://guilhermegarcia86.github.io/blog-guilherme/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/blog-guilherme/img/favicon.ico"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><link rel="alternate" type="application/atom+xml" href="https://guilhermegarcia86.github.io/blog-guilherme/blog/atom.xml" title="Tutoriais Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://guilhermegarcia86.github.io/blog-guilherme/blog/feed.xml" title="Tutoriais Blog RSS Feed"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/blog-guilherme/js/scrollSpy.js"></script><link rel="stylesheet" href="/blog-guilherme/css/main.css"/><script src="/blog-guilherme/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/blog-guilherme/"><img class="logo" src="/blog-guilherme/img/favicon.ico" alt="Tutoriais"/><h2 class="headerTitleWithLogo">Tutoriais</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/blog-guilherme/docs/doc4" target="_self">Apostilas</a></li><li class="siteNavGroupActive"><a href="/blog-guilherme/blog/" target="_self">Blog</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Recent Posts</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Recent Posts</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/blog-guilherme/blog/2020/04/20/post-kubernetes">Kubernetes</a></li><li class="navListItem"><a class="navItem" href="/blog-guilherme/blog/2020/04/10/post-docker">Docker</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer postContainer blogContainer"><div class="wrapper"><div class="lonePost"><div class="post"><header class="postHeader"><h1 class="postHeaderTitle"><a href="/blog-guilherme/blog/2020/04/20/post-kubernetes">Kubernetes</a></h1><p class="post-meta">April 20, 2020</p><div class="authorBlock"><p class="post-authorName"><a href="https://twitter.com/guilherme_ga86" target="_blank" rel="noreferrer noopener">Guilherme Alves</a></p><div class="authorPhoto"><a href="https://twitter.com/guilherme_ga86" target="_blank" rel="noreferrer noopener"><img src="https://graph.facebook.com/1426803577/picture/?height=200&amp;width=200" alt="Guilherme Alves"/></a></div></div></header><div><span><h1><a class="anchor" aria-hidden="true" id="kubernetes"></a><a href="#kubernetes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Kubernetes</h1>
+<p><strong>Docker</strong></p>
+<p>Uma das vantagens do <strong>Docker</strong> é a questão da portabilidade, os diferentes ambientes, desenvolvimento, homologação, produção podem ter sido configurados de diferentes maneiras o que pode fazer com que a aplicação funcione em um ambiente em não em outro. Através do <strong>Docker</strong>, é possível guardar em um container nossa aplicação com as dependências necessárias para que ela funcione, independentemente de estarmos no ambiente de desenvolvimento, homologação ou produção.</p>
+<p><strong>Kubernetes</strong></p>
+<p>O <strong>Kubernetes</strong> é uma plataforma open-source desenvolvida pela <strong>Google</strong>, lançada em 2015, com o objetivo de gerenciar containers que formam uma aplicação, automatizando assim processos de implementação, monitoramento e escalonamento.</p>
+<p>O nome &quot;<strong>Kubernetes</strong>&quot; que vem da língua grega e significa <em>timoneiro</em> (o tripulante que navega o barco). Como o nome e a pronuncia é um pouco diferente, se popularizou a abreviação: <strong>K8s</strong></p>
+<p><strong>Kubernetes</strong> é uma plataforma de gerenciamento de aplicações baseadas em containers, com o objetivo de que esses containers sigam um determinado estado de configuração.</p>
+<ul>
+<li>o <strong>Kubernetes</strong> é utilizado para criar um <em>cluster</em></li>
+<li>um <em>cluster</em> é um ou mais container para disponibilizar que forma uma aplicação</li>
+<li>dentro do <em>cluster</em> as maquinas se conhecem mas existe um &quot;gerente&quot;</li>
+<li>o gerente se chama <em>master</em> (mestre em português)</li>
+<li>no <em>cluster</em> também tem um ou mais <em>node</em> para rodar a aplicação</li>
+<li>o Kubernetes tem o seu foco em aplicações que rodam usando containers</li>
+<li>o Kubernetes é uma plataforma open-source desenvolvida pela <strong>Google</strong></li>
+</ul>
+<p>Os maiores provedores são;</p>
+<ul>
+<li>Amazon EKS</li>
+<li>Azure Kubernetes Service</li>
+<li>IBM Kubernetes Service</li>
+<li>Red Hat OpenShift Container Platform</li>
+</ul>
+<p><strong>VirtualBox VM</strong></p>
+<p>Para podermos usar o Kubernetes localmente devemos antes de mais nada ter um ambiente virtualizado para rodar o Minikube. Para isso precisamos instalar o VirtualBox.</p>
+<p><strong>Kubectl</strong></p>
+<p>Éa ferramenta de configuração da linha de comando do Kubernetes.</p>
+<p><strong>Instalação</strong></p>
+<p><a href="https://kubernetes.io/docs/tasks/tools/install-kubectl/">Kubectl install and setup</a></p>
+<p><strong>Minikube</strong></p>
+<p>O <strong>Minikube</strong>é uma ferramenta que facilita executar o Kubernetes localmente, executando um cluster de <strong>Kubernetes</strong> com um único nó, o <strong>minikube</strong>nada mais é do que uma implementação de simples uso do <strong>Kubernetes</strong>.</p>
+<p><strong>Instalação</strong></p>
+<p><a href="https://kubernetes.io/docs/tasks/tools/install-minikube/">Install minikube</a></p>
+<p><strong>Comandos minikube</strong></p>
+<pre><code class="hljs">minikube <span class="hljs-built_in">start</span><span class="hljs-comment"> // inicia o minikube</span>
+
+minikube dashboard<span class="hljs-comment"> // acessar dashboard</span>
+
+minikube status<span class="hljs-comment"> // status do minikube</span>
+
+minikube <span class="hljs-built_in">stop</span><span class="hljs-comment"> // parar o cluster</span>
+
+minikube ssh<span class="hljs-comment"> // acessar via ssh o cluster</span>
+
+minikube <span class="hljs-built_in">delete</span><span class="hljs-comment"> // deletar o cluster</span>
+</code></pre>
+<p><strong>POD</strong></p>
+<p>Os pods são os menores objetos que podem ser criados e gerenciados pelo Kubernetes, tais objetos são utilizados para abstrair os containers que formam uma aplicação.</p>
+<p>Um pod possui um tamanho maior do que um container, podendo assim abstrair um ou mais containers.</p>
+<p>Exemplo de arquivo para criar pod:</p>
+<pre><code class="hljs"><span class="hljs-attribute">apiVersion</span>: v1
+<span class="hljs-attribute">kind</span>: Pod
+<span class="hljs-attribute">metadata</span>:
+  <span class="hljs-attribute">name</span>: application
+<span class="hljs-attribute">spec</span>:
+  <span class="hljs-attribute">containers</span>:
+    - <span class="hljs-attribute">name</span>: container-application
+      <span class="hljs-attribute">image</span>: rafanercessian/<span class="hljs-attribute">aplicacao-loja</span>:v1
+      <span class="hljs-attribute">ports</span>:
+        - <span class="hljs-attribute">containerPort</span>: <span class="hljs-number">80</span>
+</code></pre>
+<p>Rodar POD</p>
+<pre><code class="hljs">##pode ser qualquer nome o arquivo
+kubectl create -f pod.yml
+</code></pre>
+<p><strong>DEPLOYMENT</strong></p>
+<p>O objeto Pod seria o mais básico existente no Kubernetes e não adiciona uma camada do estado desejado de nossa aplicação para o Kubernetes gerenciar, dessa forma, quando trabalhamos com o Kubernetes, nós abstraimos o objeto Pod dentro de um objeto que oferece tais recursos, como por exemplo o objeto Deployment.</p>
+<p>Exemplo de arquivo para criar deployment:</p>
+<pre><code class="hljs"><span class="hljs-attribute">apiVersion</span>: apps/v1
+<span class="hljs-attribute">kind</span>: Deployment
+<span class="hljs-attribute">metadata</span>:
+  <span class="hljs-attribute">name</span>: appication-deployment
+<span class="hljs-attribute">spec</span>:
+  <span class="hljs-attribute">selector</span>:
+    <span class="hljs-attribute">matchLabels</span>:
+      <span class="hljs-attribute">name</span>: application-pod
+  <span class="hljs-attribute">template</span>:
+    <span class="hljs-attribute">metadata</span>:
+      <span class="hljs-attribute">labels</span>:
+        <span class="hljs-attribute">name</span>: application-pod
+    <span class="hljs-attribute">spec</span>:
+      <span class="hljs-attribute">containers</span>:
+        - <span class="hljs-attribute">name</span>: container-application
+          <span class="hljs-attribute">image</span>: rafanercessian/<span class="hljs-attribute">aplicacao-loja</span>:v1
+          <span class="hljs-attribute">ports</span>:
+            - <span class="hljs-attribute">containerPort</span>: <span class="hljs-number">80</span>
+</code></pre>
+<p><strong>Rodar Deployment</strong></p>
+<pre><code class="hljs">##O nome do arquivo pode ser qualquer um
+kubectl create -f deployment.yml
+</code></pre>
+<p><strong>Escalar PODs</strong></p>
+<p>No dashboard podemos adicionar a quantidade de PODs.</p>
+<p>Se tentarmos acessar o um diretamente pelo seu IP não será possível pois como são objetos voláteis precisamos de outra forma de acessá-los.</p>
+<p>Objeto Service é que fará o acesso aos PODs</p>
+<p><strong>SERVICE</strong></p>
+<p>Objeto que faz a comunicação entre os PODs, esse aqui fará o LoadBalance entre aplicações.</p>
+<p>Exemplo:</p>
+<pre><code class="hljs"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">Service</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">service-application</span>
+<span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">type:</span> <span class="hljs-string">LoadBalancer</span>
+  <span class="hljs-attr">ports:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">port:</span> <span class="hljs-number">80</span>
+      <span class="hljs-attr">name:</span> <span class="hljs-string">http</span>
+      <span class="hljs-attr">nodePort:</span> <span class="hljs-number">31822</span>
+  <span class="hljs-attr">selector:</span>
+    <span class="hljs-attr">name:</span> <span class="hljs-string">application-pod</span>
+</code></pre>
+<p>Rodar Service:</p>
+<pre><code class="hljs"><span class="hljs-selector-tag">kubectl</span> <span class="hljs-selector-tag">create</span> <span class="hljs-selector-tag">-f</span> <span class="hljs-selector-tag">service</span><span class="hljs-selector-class">.yml</span>
+</code></pre>
+<p>Pegar IP do Service:</p>
+<pre><code class="hljs">minikube<span class="hljs-built_in"> service </span>service-application --url
+</code></pre>
+<p><strong>STAFULSET</strong></p>
+<p>Objeto para guardar volumes.</p>
+<p>Exemplo de um MySQL com um volume mapeado:</p>
+<pre><code class="hljs"><span class="hljs-attribute">apiVersion</span>: apps/v1beta1
+<span class="hljs-attribute">kind</span>: StatefulSet
+<span class="hljs-attribute">metadata</span>:
+  <span class="hljs-attribute">name</span>: statefulset-mysql
+<span class="hljs-attribute">spec</span>:
+  <span class="hljs-attribute">serviceName</span>: db
+  <span class="hljs-attribute">template</span>:
+    <span class="hljs-attribute">metadata</span>:
+      <span class="hljs-attribute">labels</span>:
+        <span class="hljs-attribute">name</span>: mysql
+    <span class="hljs-attribute">spec</span>:
+      <span class="hljs-attribute">containers</span>:
+        - <span class="hljs-attribute">name</span>: container-mysql
+          <span class="hljs-attribute">image</span>: <span class="hljs-attribute">mysql</span>:<span class="hljs-number">5.7</span>.<span class="hljs-number">19</span>
+          <span class="hljs-attribute">ports</span>:
+            - <span class="hljs-attribute">containerPort</span>: <span class="hljs-number">3306</span>
+          <span class="hljs-attribute">env</span>:
+            - <span class="hljs-attribute">name</span>: MYSQL_DATABASE
+              <span class="hljs-attribute">value</span>: <span class="hljs-string">"loja"</span>
+            - <span class="hljs-attribute">name</span>: MYSQL_USER
+              <span class="hljs-attribute">value</span>: <span class="hljs-string">"root"</span>
+            - <span class="hljs-attribute">name</span>: MYSQL_ALLOW_EMPTY_PASSWORD
+              <span class="hljs-attribute">value</span>: <span class="hljs-string">"1"</span>
+          <span class="hljs-attribute">volumeMounts</span>:
+            - <span class="hljs-attribute">name</span>: volume-mysql
+              <span class="hljs-attribute">mountPath</span>: /var/lib/mysql
+      <span class="hljs-attribute">volumes</span>:
+        - <span class="hljs-attribute">name</span>: volume-mysql
+          <span class="hljs-attribute">persistentVolumeClaim</span>:
+            <span class="hljs-attribute">claimName</span>: configuration-mysql
+</code></pre>
+<p><strong>PersistentVolumeClaim</strong></p>
+<p>O objeto <strong>PersistentVolumeClaim</strong> irá conter as configurações de requisição de consumo de recursos de um volume persistente criado pelo administrador do cluster. O <strong>PersistentVolumeClaim</strong> apenas define as permissões e o tamanho do storage.</p>
+<p>Objeto que contem as permissões de recursos dos <strong>PODs</strong></p>
+<p>Exemplo:</p>
+<pre><code class="hljs"><span class="hljs-symbol">apiVersion:</span> v1
+<span class="hljs-symbol">kind:</span> PersistentVolumeClaim
+<span class="hljs-symbol">metadata:</span>
+<span class="hljs-symbol">  name:</span> configuration-mysql
+<span class="hljs-symbol">spec:</span>
+<span class="hljs-symbol">  accessModes:</span>
+    - ReadWriteOnce
+<span class="hljs-symbol">  resources:</span>
+<span class="hljs-symbol">    requests:</span>
+<span class="hljs-symbol">      storage:</span> <span class="hljs-number">3</span>Gi
+</code></pre>
+<p><strong>SERVICE DB</strong></p>
+<p>Objeto que fará a comunicação entre os serviços web e o banco de dados.</p>
+<p>Para o objeto <strong>StatefulSet</strong> funcionar, ele será um tanto diferente do que foi feito com o objeto Deployment, já que o primeiro exige a referência bidirecional. É preciso indicar a ele o serviço responsável pela abstração do objeto Pod.</p>
+<p>Para isso, no arquivo do <strong>StatefulSet</strong>, logo abaixo de <strong>spec</strong>, acresentaremos <strong>serviceName</strong>, que será o nome do serviço colocado no arquivo do <strong>SERVICE DB</strong>, ou seja, db:</p>
+<pre><code class="hljs"><span class="hljs-attribute">apiVersion</span>: apps/v1
+<span class="hljs-attribute">kind</span>: StatefulSet
+<span class="hljs-attribute">metadata</span>:
+  <span class="hljs-attribute">name</span>: aplicacao-sistema-statefulset
+<span class="hljs-attribute">spec</span>:
+  <span class="hljs-attribute">serviceName</span>: aplicacao-sistema-statefulset
+  <span class="hljs-attribute">selector</span>:
+    <span class="hljs-attribute">matchLabels</span>:
+      <span class="hljs-attribute">name</span>: aplicacao-sistema-pod-statefulset
+  <span class="hljs-attribute">template</span>:
+    <span class="hljs-attribute">metadata</span>:
+      <span class="hljs-attribute">labels</span>:
+        <span class="hljs-attribute">name</span>: aplicacao-sistema-pod-statefulset
+    <span class="hljs-attribute">spec</span>:
+      <span class="hljs-attribute">containers</span>:
+        - <span class="hljs-attribute">name</span>: container-aplicacao-sistema-statefulset-v4
+          <span class="hljs-attribute">image</span>: jnlucas/<span class="hljs-attribute">noticia-alura</span>:v4
+          <span class="hljs-attribute">ports</span>:
+            - <span class="hljs-attribute">containerPort</span>: <span class="hljs-number">80</span>
+          <span class="hljs-attribute">lifecycle</span>:
+            <span class="hljs-attribute">postStart</span>:
+              <span class="hljs-attribute">exec</span>:
+                <span class="hljs-attribute">command</span>: [<span class="hljs-string">"sh"</span>,<span class="hljs-string">"enviarMensagens.sh"</span>]
+
+          <span class="hljs-attribute">volumeMounts</span>:
+            - <span class="hljs-attribute">name</span>: imagens
+              <span class="hljs-attribute">mountPath</span>: /var/www/html/uploads
+            - <span class="hljs-attribute">name</span>: sessoes
+              <span class="hljs-attribute">mountPath</span>: /tmp
+      <span class="hljs-attribute">volumes</span>:
+        - <span class="hljs-attribute">name</span>: imagens
+          <span class="hljs-attribute">persistentVolumeClaim</span>:
+            <span class="hljs-attribute">claimName</span>: permissao-imagens
+        - <span class="hljs-attribute">name</span>: sessoes
+          <span class="hljs-attribute">persistentVolumeClaim</span>:
+            <span class="hljs-attribute">claimName</span>: permissao-sessao
+</code></pre>
+<p>Exemplo do arquivo .sh</p>
+<pre><code class="hljs"><span class="hljs-meta">#!/bin/bash
+</span>
+curl -X POST
+
+-H <span class="hljs-string">'Content-type: alication/json'</span>
+
+--data <span class="hljs-string">'{
+
+"text": "Olá, um novo pod acabou de ser criado!"
+
+}'</span>
+
+https://hooks.slack.com/services/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
+</code></pre>
+<p><strong>Automatizando Autoscaler</strong></p>
+<p>Primeiramente devemos configurar o arquivo que contém o <strong>Deployment</strong> para que ele contenha métricas, no caso de exemplo uma métrica de CPU para cada POD:</p>
+<pre><code class="hljs"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">apps/v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">Deployment</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">application-deployment</span>
+<span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">selector:</span>
+    <span class="hljs-attr">matchLabels:</span>
+      <span class="hljs-attr">name:</span> <span class="hljs-string">application-pod</span>
+  <span class="hljs-attr">template:</span>
+    <span class="hljs-attr">metadata:</span>
+      <span class="hljs-attr">labels:</span>
+        <span class="hljs-attr">name:</span> <span class="hljs-string">application-pod</span>
+    <span class="hljs-attr">spec:</span>
+      <span class="hljs-attr">containers:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">container-application-cpu</span>
+          <span class="hljs-attr">image:</span> <span class="hljs-string">jnlucas/noticia-alura:v3</span>
+          <span class="hljs-attr">ports:</span>
+            <span class="hljs-bullet">-</span> <span class="hljs-attr">containerPort:</span> <span class="hljs-number">80</span>
+          <span class="hljs-comment">#Aqui é feita a definição de métricas</span>
+          <span class="hljs-attr">resources:</span>
+            <span class="hljs-attr">requests:</span>
+              <span class="hljs-attr">cpu:</span> <span class="hljs-string">200m</span>
+</code></pre>
+<p>Agora é necessário adicionar essa métrica ao ambiente do Kubernetes</p>
+<pre><code class="hljs">kubectl autoscale deployment application-deployment <span class="hljs-attribute">--cpu-percent</span>=50 <span class="hljs-attribute">--min</span>=1 <span class="hljs-attribute">--max</span>=10
+</code></pre>
+<p>Aqui definimos o autoscale para o application-deployment que se a porcentagem da CPU passar 50% iremos inicializar um novo POD com um limite de até 10. E com isso também definimos que se a porcentagem abaixar ele também irá matar esses PODs com o mínimo de 1 POD.</p>
+<p><strong>Parametrização de CPU e memória de cada Pod</strong></p>
+<ul>
+<li>a configuração para tal é feita no container através de um elemento <em>resources</em> onde podemos especificar <em>requests</em> e <em>limits</em></li>
+<li><em>requests</em> é o valor o container está garantido de ter</li>
+<li><em>limits</em> é o máximo permitido o que o container terá disponível</li>
+</ul>
+<pre><code class="hljs"><span class="hljs-symbol">resources:</span>
+<span class="hljs-symbol">requests:</span>
+<span class="hljs-symbol">  memory:</span> <span class="hljs-string">"16Mi"</span>
+<span class="hljs-symbol">  cpu:</span> <span class="hljs-string">"100m"</span>
+<span class="hljs-symbol">limits:</span>
+<span class="hljs-symbol">  memory:</span> <span class="hljs-string">"32Mi"</span>
+<span class="hljs-symbol">  cpu:</span> <span class="hljs-string">"200m"</span>
+</code></pre>
+<p><strong>Comandos</strong></p>
+<pre><code class="hljs"><span class="hljs-comment">#para listar os addons</span>
+
+minikube addons list
+
+<span class="hljs-comment">#para habilitar</span>
+
+minikube addons <span class="hljs-builtin-name">enable</span> metrics-server
+
+<span class="hljs-comment">#Para desabilitar</span>
+
+minikube addons <span class="hljs-builtin-name">disable</span> metrics-server
+
+<span class="hljs-comment">##detalhes sobre todos os pods</span>
+
+kubectl describe pods | grep<span class="hljs-built_in"> IP
+</span>
+<span class="hljs-comment">##detalhes de um pod especifico</span>
+
+kubectl describe pod &lt;nome-do-pod&gt;
+
+<span class="hljs-comment">## mais informações</span>
+
+kubectl <span class="hljs-builtin-name">get</span> pods -o wide
+
+kubectl <span class="hljs-builtin-name">get</span> nodes
+
+kubectl explain pod
+
+kubectl explain node
+
+kubectl <span class="hljs-builtin-name">get</span> pod &lt;nome-do-pod&gt;
+
+kubectl <span class="hljs-builtin-name">get</span> deployment &lt;nome-do-deployment&gt;
+
+kubectl <span class="hljs-builtin-name">get</span><span class="hljs-built_in"> service </span>&lt;nome-do-service&gt;
+
+kubectl scale deployment application-deployment <span class="hljs-attribute">--replicas</span>=3
+
+kubectl create -f service-application.yaml
+
+kubectl <span class="hljs-builtin-name">get</span> pods
+
+kubectl logs &lt;nome-pod-name&gt;
+
+kubectl exec -it [nome <span class="hljs-keyword">do</span> Pod com o banco] sh
+
+kubectl <span class="hljs-builtin-name">get</span><span class="hljs-built_in"> service
+</span>
+kubectl create -f statefulset.yaml
+
+kubectl create -f service-database.yaml
+
+kubectl create -f permitions.yaml
+
+kubectl create -f deployment.yaml
+
+kubectl create -f service-application.yaml
+
+<span class="hljs-comment">##Editando um Deployment via VIM e command line</span>
+
+kubectl <span class="hljs-builtin-name">edit</span> deployment aplicacao-noticia-deployment
+
+<span class="hljs-comment">##para listar os pods</span>
+
+kubectl <span class="hljs-builtin-name">get</span> pods
+
+<span class="hljs-comment">##tbm funcionar para deployments e services, por exemplo:</span>
+
+kubectl <span class="hljs-builtin-name">get</span> services
+
+<span class="hljs-comment">##para detalhes de um pod</span>
+
+kubectl describe pod &lt;nome-pod&gt;
+
+<span class="hljs-comment">##o comando describe tbm funciona para deployment e service, por exemplo:</span>
+
+kubectl describe<span class="hljs-built_in"> service </span>&lt;nome&gt;
+
+<span class="hljs-comment">##para criar pod, deployment ou service a partir de um arquivo yml</span>
+
+kubectl create -f &lt;nome-arquivo-yml&gt;
+
+<span class="hljs-comment">##para remover pod, deployment ou service a partir de um arquivo yml</span>
+
+kubectl delete -f &lt;nome-arquivo-yml&gt;
+
+<span class="hljs-comment">##para remover um pod</span>
+
+kubectl delete pod &lt;nome-pod&gt;
+
+<span class="hljs-comment">##para remover um deployment</span>
+
+kubectl delete deployment &lt;nome-deployment&gt;
+
+<span class="hljs-comment">##para remover um service</span>
+
+kubectl delete<span class="hljs-built_in"> service </span>&lt;nome-service&gt;
+</code></pre>
+</span></div></div><div class="blogSocialSection"><div class="blogSocialSectionItem"><a href="https://twitter.com/share" class="twitter-share-button" data-text="Kubernetes" data-url="https://guilhermegarcia86.github.io/blog-guilherme/blog/2020/04/20/post-kubernetes" data-related="true" data-via="guilherme_ga86" data-show-count="false">Tweet</a></div><div class="blogSocialSectionItem"><div class="fb-like" data-href="https://guilhermegarcia86.github.io/blog-guilherme/blog/2020/04/20/post-kubernetes" data-layout="standard" data-share="true" data-width="225" data-show-faces="false"></div></div><div class="blogSocialSectionItem"><div class="fb-comments" data-href="https://guilhermegarcia86.github.io/blog-guilherme/blog/2020/04/20/post-kubernetes" data-width="100%" data-numposts="5" data-order-by="time"></div></div></div></div><div class="blog-recent"><a class="button" href="/blog-guilherme/blog/">Recent Posts</a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/blog-guilherme/" class="nav-home"><img src="/blog-guilherme/img/favicon.ico" alt="Tutoriais" width="66" height="58"/></a><div><h5>Docs</h5><a href="/blog-guilherme/docs/en/doc1.html">Getting Started (or other categories)</a><a href="/blog-guilherme/docs/en/doc2.html">Guides (or other categories)</a><a href="/blog-guilherme/docs/en/doc3.html">API Reference (or other categories)</a></div><div><h5>Community</h5><a href="/blog-guilherme/en/users.html">User Showcase</a><a href="https://stackoverflow.com/questions/tagged/" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://discordapp.com/">Project Chat</a><a href="https://twitter.com/" target="_blank" rel="noreferrer noopener">Twitter</a></div><div><h5>More</h5><a href="/blog-guilherme/blog">Blog</a><a href="https://github.com/">GitHub</a><a class="github-button" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a><div class="social"><div class="fb-like" data-href="https://guilhermegarcia86.github.io" data-colorscheme="dark" data-layout="standard" data-share="true" data-width="225" data-show-faces="false"></div></div></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/blog-guilherme/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2020</section></footer></div><script>window.fbAsyncInit = function() {FB.init({appId:'524104774884756',xfbml:true,version:'v2.7'});};(function(d, s, id){var js, fjs = d.getElementsByTagName(s)[0];if (d.getElementById(id)) {return;}js = d.createElement(s); js.id = id;js.src = '//connect.facebook.net/en_US/sdk.js';fjs.parentNode.insertBefore(js, fjs);}(document, 'script','facebook-jssdk'));
+                </script><script>window.twttr=(function(d,s, id){var js,fjs=d.getElementsByTagName(s)[0],t=window.twttr||{};if(d.getElementById(id))return t;js=d.createElement(s);js.id=id;js.src='https://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js, fjs);t._e = [];t.ready = function(f) {t._e.push(f);};return t;}(document, 'script', 'twitter-wjs'));</script></body></html>
