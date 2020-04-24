@@ -28,12 +28,14 @@ const siteConfig = {
   headerLinks: [
     {doc: 'doc4', label: 'Apostilas'},
     {blog: true, label: 'Blog'},
+    {href: 'about', label: 'About'},
+    {search: true},
   ],
 
   /* path to images for header/footer */
-  headerIcon: 'img/favicon.ico',
-  footerIcon: 'img/favicon.ico',
-  favicon: 'img/favicon.ico',
+  headerIcon: 'img/dog.png',
+  footerIcon: 'img/dog.png',
+  favicon: 'img/dog.png',
 
   /* Colors for website */
   colors: {
