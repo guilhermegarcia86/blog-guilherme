@@ -11,14 +11,14 @@
 const siteConfig = {
   title: 'Tutoriais', // Title for your website.
   tagline: 'Um website pra divulgar conhecimento',
-  url: 'https://your-docusaurus-test-site.com', // Your website URL
-  baseUrl: '/', // Base URL for your project */
+  url: 'https://guilhermegarcia86.github.io', // Your website URL
+  baseUrl: '/blog-guilherme/', // Base URL for your project */
   // For github.io type URLs, you would set the url and baseUrl like:
   //   url: 'https://facebook.github.io',
   //   baseUrl: '/test-site/',
 
   // Used for publishing and more
-  projectName: 'tutorial-site',
+  projectName: 'blog-guilherme',
   organizationName: 'guilhermegarcia86',
   // For top-level user or org sites, the organization is still the same.
   // e.g., for the https://JoelMarcey.github.io site, it would be set like...
