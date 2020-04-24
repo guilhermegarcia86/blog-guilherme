@@ -1,0 +1,177 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>AWS S3 · Tutoriais</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="# AWS S3"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="AWS S3 · Tutoriais"/><meta property="og:type" content="website"/><meta property="og:url" content="https://guilhermegarcia86.github.io/blog-guilherme/blog/2020/04/24/post-s3"/><meta property="og:description" content="# AWS S3"/><meta property="og:image" content="https://guilhermegarcia86.github.io/blog-guilherme/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://guilhermegarcia86.github.io/blog-guilherme/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/blog-guilherme/img/favicon.ico"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><link rel="alternate" type="application/atom+xml" href="https://guilhermegarcia86.github.io/blog-guilherme/blog/atom.xml" title="Tutoriais Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://guilhermegarcia86.github.io/blog-guilherme/blog/feed.xml" title="Tutoriais Blog RSS Feed"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/blog-guilherme/js/scrollSpy.js"></script><link rel="stylesheet" href="/blog-guilherme/css/main.css"/><script src="/blog-guilherme/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/blog-guilherme/"><img class="logo" src="/blog-guilherme/img/favicon.ico" alt="Tutoriais"/><h2 class="headerTitleWithLogo">Tutoriais</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/blog-guilherme/docs/doc4" target="_self">Apostilas</a></li><li class="siteNavGroupActive"><a href="/blog-guilherme/blog/" target="_self">Blog</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Recent Posts</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Recent Posts</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/blog-guilherme/blog/2020/04/24/post-s3">AWS S3</a></li><li class="navListItem"><a class="navItem" href="/blog-guilherme/blog/2020/04/20/post-kubernetes">Kubernetes</a></li><li class="navListItem"><a class="navItem" href="/blog-guilherme/blog/2020/04/10/post-docker">Docker</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer postContainer blogContainer"><div class="wrapper"><div class="lonePost"><div class="post"><header class="postHeader"><h1 class="postHeaderTitle"><a href="/blog-guilherme/blog/2020/04/24/post-s3">AWS S3</a></h1><p class="post-meta">April 24, 2020</p><div class="authorBlock"><p class="post-authorName"><a href="https://twitter.com/guilherme_ga86" target="_blank" rel="noreferrer noopener">Guilherme Alves</a></p><div class="authorPhoto"><a href="https://twitter.com/guilherme_ga86" target="_blank" rel="noreferrer noopener"><img src="https://graph.facebook.com/1426803577/picture/?height=200&amp;width=200" alt="Guilherme Alves"/></a></div></div></header><div><span><h1><a class="anchor" aria-hidden="true" id="aws-s3"></a><a href="#aws-s3" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>AWS S3</h1>
+<p><strong>Conceito inicial</strong></p>
+<p>Serviço de armazenamento de objetos, podendo ser arquivos, imagens e etc.</p>
+<p>Criar S3 é simples pois a interface da AWS é amigável e podemos iniciar um bucket, que é agregador de arquivos (objetos) como as configurações padrões e depois mudar conforme necessidade a única coisa que não é permitido mudar é o nome, tendo o nome de ser único e seguindo algumas regras de validação na hora da criação do bucket.</p>
+<p><strong>Static Web</strong></p>
+<p>Temos a possibilidade de configurar o S3 para ser um servidor simples de páginas estáticas.</p>
+<p>Basta habilitar a opção no bucket e configurar qual será a página estática e página de erro, fazer o upload delas e fazer as configurações de permissão do arquivo.</p>
+<p><strong>Command Line</strong></p>
+<p>Ferramenta que serve para automatização de processos na AWS, não é exclusivo do S3 serve para uma série de serviços na AWS.</p>
+<p>É necessário configurar a segurança no cli, podendo ser por um usuário root (a maneira mais simples porém mais frágil pois gera um par de chave:senha que caso seja perdido ou usado por outro cli não como saber) ou configuração no IAM para configurações de grupos e usuários.</p>
+<p>Comandos:</p>
+<p><strong>BUCKET</strong></p>
+<pre><code class="hljs"><span class="hljs-symbol">aws</span> <span class="hljs-built_in">s3</span> mb (make_bucket) <span class="hljs-built_in">s3</span>://nome &lt;CRIA&gt;
+
+<span class="hljs-symbol">aws</span> <span class="hljs-built_in">s3</span> rb (remove_bucket) nome &lt;REMOVE VAZIO&gt; opção --force remove tudo
+
+<span class="hljs-symbol">aws</span> <span class="hljs-built_in">s3</span> ls <span class="hljs-built_in">s3</span>://NOME &lt;LISTA O CONTEUDO DO <span class="hljs-keyword">BUCKET&gt;
+</span></code></pre>
+<p><strong>OBJETOS</strong></p>
+<pre><code class="hljs"><span class="hljs-symbol">aws</span> <span class="hljs-built_in">s3</span> <span class="hljs-meta">cp</span> <span class="hljs-built_in">s3</span>://nomeBucket/objetoNome.extenssão . (dowload do objeto na máquina)
+
+<span class="hljs-symbol">aws</span> <span class="hljs-built_in">s3</span> <span class="hljs-meta">cp</span> nomeArquivo <span class="hljs-built_in">s3</span>://<span class="hljs-keyword">bucket </span>(upload no <span class="hljs-keyword">bucket </span>específico)
+
+<span class="hljs-symbol">aws</span> <span class="hljs-built_in">s3</span> rm <span class="hljs-built_in">s3</span>://<span class="hljs-keyword">bucket/arquivo </span>(removo do <span class="hljs-keyword">bucket </span>o arquivo)
+
+<span class="hljs-symbol">aws</span> <span class="hljs-built_in">s3</span> mv <span class="hljs-built_in">s3</span>://<span class="hljs-keyword">bucket/arquivo </span><span class="hljs-built_in">s3</span>://<span class="hljs-keyword">bucket/novoNomeArquivo </span>(renomeia arquivo)
+
+<span class="hljs-symbol">aws</span> <span class="hljs-built_in">s3</span> sync <span class="hljs-built_in">s3</span>://<span class="hljs-keyword">bucket </span>nomePastaLocal (sincroniza ambientes a partir do <span class="hljs-keyword">bucket)
+</span>
+<span class="hljs-symbol">aws</span> <span class="hljs-built_in">s3</span> sync . <span class="hljs-built_in">s3</span>://<span class="hljs-keyword">bucket </span>(sincroniza ambientes a partir do local)
+</code></pre>
+<p>P.S.: No caso de delete deve adicionar a flag --delete</p>
+<h2><a class="anchor" aria-hidden="true" id="política-de-acesso-a-grupos-de-usuários"></a><a href="#política-de-acesso-a-grupos-de-usuários" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Política de acesso a grupos de usuários</h2>
+<p><strong>Serviço IAM</strong></p>
+<p>Configuração via wizard na AWS, nele é possível criar um usuário, um grupo de usuários e definir os acessos aos serviços na AWS.</p>
+<p>No IAM é possível dar acesso total ou fazer refinamento de acessos, para leitura, edição e etc., porém para fazer esse refinamento é necessário mais configurações no IAM pois neste caso do S2 conseguimos fazer com que o um grupo consigo listar os buckets definindo a política AllowListBuckets:</p>
+<pre><code class="hljs">{
+
+    <span class="hljs-attr">"Version"</span>: <span class="hljs-string">"2012-10-17"</span>,
+
+    <span class="hljs-attr">"Statement"</span>: [
+
+        {
+
+            <span class="hljs-attr">"Sid"</span>: <span class="hljs-string">"Stmt1505251989000"</span>,
+
+            <span class="hljs-attr">"Effect"</span>: <span class="hljs-string">"Allow"</span>,
+
+            <span class="hljs-attr">"Action"</span>: [
+
+                <span class="hljs-string">"s3:ListAllMyBuckets"</span>
+
+            ],
+
+            <span class="hljs-attr">"Resource"</span>: [
+
+                <span class="hljs-string">"arn:aws:s3:::*"</span>
+
+            ]
+
+        }
+
+    ]
+
+}
+</code></pre>
+<p>E com isso o usuário desse grupo consegue listar os buckets mas perde o acesso a ver o conteúdo dos buckets e é necessário dar permissão de visualizar o conteúdo adicionando uma política AllowAccesBucket:</p>
+<pre><code class="hljs">{
+
+    <span class="hljs-attr">"Version"</span>: <span class="hljs-string">"2012-10-17"</span>,
+
+    <span class="hljs-attr">"Statement"</span>: [
+
+        {
+
+            <span class="hljs-attr">"Sid"</span>: <span class="hljs-string">"Stmt1505254613000"</span>,
+
+            <span class="hljs-attr">"Effect"</span>: <span class="hljs-string">"Allow"</span>,
+
+            <span class="hljs-attr">"Action"</span>: [
+
+                <span class="hljs-string">"s3:*"</span>
+
+            ],
+
+            <span class="hljs-attr">"Resource"</span>: [
+
+                <span class="hljs-string">"arn:aws:s3:::alura-s3"</span>, <span class="hljs-comment">// Garante acesso ao bucket</span>
+
+                <span class="hljs-string">"arn:aws:s3:::alura-s3/*"</span> <span class="hljs-comment">// Concede privilegio ao conteúdo para escrita e edição</span>
+
+            ]
+
+        }
+
+    ]
+
+}
+</code></pre>
+<p>E com isso o usuário tem acesso a ver conteúdo do bucket e tem privilégio de escrita e edição.</p>
+<p><strong>SDK</strong></p>
+<p>Ferramenta desenvolvida pela AWS para podermos de forma programática acessar os recursos, neste caso será usado para o S3, podemos com ele fazer as operações dentro de uma aplicação como upload, delete, leitura e etc.</p>
+<p><strong>Versionamento</strong></p>
+<p>Habilitar versionamento via console.</p>
+<p>Classes de armazenamento</p>
+<p>Standard - mais rápida (arquivos constantemente usados)</p>
+<p>Standard-IA - igual ao Standard porém com regras de armazenamento e taxa de recuperação (usado para arquivos que não usados com tanta frequência)</p>
+<p>Glacier - mais lento (arquivos não usados com frequência - backups e etc.)</p>
+<p>Ciclo de vida</p>
+<p>Exemplo:</p>
+<p>0 dia Arquivo Standard -&gt; 30 dias Arquivo Standard-IA -&gt; 60 dias Arquivo Glacier -&gt; 365 dias Expiração Deleção</p>
+<p>Amazon S3 -&gt;  Escolher Bucket -&gt; Aba Management -&gt; Button Add lifecycle rule -&gt; Wizard:</p>
+<ol>
+<li><p>Rule Name</p></li>
+<li><p>Add filter by tag or prefix</p></li>
+<li><p>Configure transition, can be for current version or previous versions or both.</p></li>
+<li><p>Add transition, configure after 30 days go to Standard-IA and after 60 days go to Glacier</p></li>
+<li><p>Configure expiration, after 365 days expire.</p></li>
+</ol>
+</span></div></div><div class="blogSocialSection"><div class="blogSocialSectionItem"><a href="https://twitter.com/share" class="twitter-share-button" data-text="AWS S3" data-url="https://guilhermegarcia86.github.io/blog-guilherme/blog/2020/04/24/post-s3" data-related="true" data-via="guilherme_ga86" data-show-count="false">Tweet</a></div><div class="blogSocialSectionItem"><div class="fb-like" data-href="https://guilhermegarcia86.github.io/blog-guilherme/blog/2020/04/24/post-s3" data-layout="standard" data-share="true" data-width="225" data-show-faces="false"></div></div><div class="blogSocialSectionItem"><div class="fb-comments" data-href="https://guilhermegarcia86.github.io/blog-guilherme/blog/2020/04/24/post-s3" data-width="100%" data-numposts="5" data-order-by="time"></div></div></div></div><div class="blog-recent"><a class="button" href="/blog-guilherme/blog/">Recent Posts</a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#política-de-acesso-a-grupos-de-usuários">Política de acesso a grupos de usuários</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/blog-guilherme/" class="nav-home"><img src="/blog-guilherme/img/favicon.ico" alt="Tutoriais" width="66" height="58"/></a><div><h5>Docs</h5><a href="/blog-guilherme/docs/en/doc1.html">Getting Started (or other categories)</a><a href="/blog-guilherme/docs/en/doc2.html">Guides (or other categories)</a><a href="/blog-guilherme/docs/en/doc3.html">API Reference (or other categories)</a></div><div><h5>Community</h5><a href="/blog-guilherme/en/users.html">User Showcase</a><a href="https://stackoverflow.com/questions/tagged/" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://discordapp.com/">Project Chat</a><a href="https://twitter.com/" target="_blank" rel="noreferrer noopener">Twitter</a></div><div><h5>More</h5><a href="/blog-guilherme/blog">Blog</a><a href="https://github.com/">GitHub</a><a class="github-button" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a><div class="social"><div class="fb-like" data-href="https://guilhermegarcia86.github.io" data-colorscheme="dark" data-layout="standard" data-share="true" data-width="225" data-show-faces="false"></div></div></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/blog-guilherme/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2020</section></footer></div><script>window.fbAsyncInit = function() {FB.init({appId:'524104774884756',xfbml:true,version:'v2.7'});};(function(d, s, id){var js, fjs = d.getElementsByTagName(s)[0];if (d.getElementById(id)) {return;}js = d.createElement(s); js.id = id;js.src = '//connect.facebook.net/en_US/sdk.js';fjs.parentNode.insertBefore(js, fjs);}(document, 'script','facebook-jssdk'));
+                </script><script>window.twttr=(function(d,s, id){var js,fjs=d.getElementsByTagName(s)[0],t=window.twttr||{};if(d.getElementById(id))return t;js=d.createElement(s);js.id=id;js.src='https://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js, fjs);t._e = [];t.ready = function(f) {t._e.push(f);};return t;}(document, 'script', 'twitter-wjs'));</script></body></html>
