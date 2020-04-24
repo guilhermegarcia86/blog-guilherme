@@ -9,7 +9,7 @@
         <generator>https://github.com/jpmonette/feed</generator>
         <image>
             <title>Tutoriais Blog</title>
-            <url>https://guilhermegarcia86.github.io/blog-guilherme/img/favicon.ico</url>
+            <url>https://guilhermegarcia86.github.io/blog-guilherme/img/dog.png</url>
             <link>https://guilhermegarcia86.github.io/blog-guilherme/blog</link>
         </image>
         <copyright>Copyright © 2020</copyright>
@@ -19,6 +19,13 @@
             <guid>https://guilhermegarcia86.github.io/blog-guilherme/blog/2020/04/24/post-s3.html</guid>
             <pubDate>Fri, 24 Apr 2020 06:00:00 GMT</pubDate>
             <description><![CDATA[<h1><a class="anchor" aria-hidden="true" id="aws-s3"></a><a href="#aws-s3" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewbox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"/></svg></a>AWS S3</h1> <p><strong>Conceito inicial</strong></p> <p>Serviço de armazenamento de objetos, podendo ser arquivos, imagens e etc.</p> <p>Criar S3 é simples pois a interface da AWS é amigável e podemos iniciar um bucket, que é agregador de arquivos (objetos) como as configurações padrões e...</p>]]></description>
+        </item>
+        <item>
+            <title><![CDATA[AWS ECS]]></title>
+            <link>https://guilhermegarcia86.github.io/blog-guilherme/blog/2020/04/24/post-ecs.html</link>
+            <guid>https://guilhermegarcia86.github.io/blog-guilherme/blog/2020/04/24/post-ecs.html</guid>
+            <pubDate>Fri, 24 Apr 2020 06:00:00 GMT</pubDate>
+            <description><![CDATA[<p><strong>Elastic Container Service</strong></p> <p>O Amazon Elastic Container Service (<strong>ECS</strong>) é um serviço de orquestração de contêineres.</p> <p><img src="/blog-guilherme/blog/assets/visao-geral.png" alt></p> <p>Camadas:</p> <ol> <li><p>Container - Onde fica a sua imagem (aplicação) imagem Docker</p></li> <li><p>Task - Parâmetros para a imagem rodar (memória, cpu e etc)</p></li> <li><p>Service...</p></li></ol>]]></description>
         </item>
         <item>
             <title><![CDATA[Kubernetes]]></title>

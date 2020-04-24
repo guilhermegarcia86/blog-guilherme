@@ -1,0 +1,208 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>AWS ECS · Tutoriais</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="**Elastic Container Service**"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="AWS ECS · Tutoriais"/><meta property="og:type" content="website"/><meta property="og:url" content="https://guilhermegarcia86.github.io/blog-guilherme/blog/2020/04/24/post-ecs"/><meta property="og:description" content="**Elastic Container Service**"/><meta property="og:image" content="https://guilhermegarcia86.github.io/blog-guilherme/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://guilhermegarcia86.github.io/blog-guilherme/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/blog-guilherme/img/dog.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><link rel="alternate" type="application/atom+xml" href="https://guilhermegarcia86.github.io/blog-guilherme/blog/atom.xml" title="Tutoriais Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://guilhermegarcia86.github.io/blog-guilherme/blog/feed.xml" title="Tutoriais Blog RSS Feed"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/blog-guilherme/js/scrollSpy.js"></script><link rel="stylesheet" href="/blog-guilherme/css/main.css"/><script src="/blog-guilherme/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/blog-guilherme/"><img class="logo" src="/blog-guilherme/img/dog.png" alt="Tutoriais"/><h2 class="headerTitleWithLogo">Tutoriais</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/blog-guilherme/docs/doc4" target="_self">Apostilas</a></li><li class="siteNavGroupActive"><a href="/blog-guilherme/blog/" target="_self">Blog</a></li><li class=""><a href="about" target="_self">About</a></li><li class=""><a target="_self"></a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Recent Posts</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Recent Posts</h3><ul class=""><li class="navListItem"><a class="navItem" href="/blog-guilherme/blog/2020/04/24/post-s3">AWS S3</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/blog-guilherme/blog/2020/04/24/post-ecs">AWS ECS</a></li><li class="navListItem"><a class="navItem" href="/blog-guilherme/blog/2020/04/20/post-kubernetes">Kubernetes</a></li><li class="navListItem"><a class="navItem" href="/blog-guilherme/blog/2020/04/10/post-docker">Docker</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer postContainer blogContainer"><div class="wrapper"><div class="lonePost"><div class="post"><header class="postHeader"><h1 class="postHeaderTitle"><a href="/blog-guilherme/blog/2020/04/24/post-ecs">AWS ECS</a></h1><p class="post-meta">April 24, 2020</p><div class="authorBlock"><p class="post-authorName"><a href="https://twitter.com/guilherme_ga86" target="_blank" rel="noreferrer noopener">Guilherme Alves</a></p><div class="authorPhoto"><a href="https://twitter.com/guilherme_ga86" target="_blank" rel="noreferrer noopener"><img src="https://graph.facebook.com/1426803577/picture/?height=200&amp;width=200" alt="Guilherme Alves"/></a></div></div></header><div><span><p><strong>Elastic Container Service</strong></p>
+<p>O Amazon Elastic Container Service (<strong>ECS</strong>) é um serviço de orquestração de contêineres.</p>
+<p><img src="/blog-guilherme/blog/assets/visao-geral.png" alt=""></p>
+<p>Camadas:</p>
+<ol>
+<li><p>Container - Onde fica a sua imagem (aplicação) imagem Docker</p></li>
+<li><p>Task - Parâmetros para a imagem rodar (memória, cpu e etc)</p></li>
+<li><p>Service - É onde fica a administração de instâncias</p></li>
+<li><p>Cluster - Agrupamento de instâncias (EC2 ou Fargate)</p></li>
+</ol>
+<p>O serviço ECS pode ser criado com EC2 ou Fargate. Porém o serviço do Fargate é mais genérico e mais simples com o EC2 temos acesso as máquina que são criadas.</p>
+<p><strong>Fargate</strong></p>
+<p>AWS Fargate o &quot;gerenciador&quot; da infraestrutra que roda os containers. O Fargate decide quais maquinas a usar, tipo de servers e como escalar. No modelo <strong>Fargate</strong>, toda a infraestrutura é provisionada e gerenciada automaticamente pela AWS, diferentemente do modelo EC2.</p>
+<p>Na criação do cluster pelo serviço do Fargate ele cria toda a parte de rede pra nós automaticamente que são conceitos que estão no VPC que são as faixas de rede nas quais a instancias estão associadas. Então ele cria tudo automaticamente como por exemplo o range da rede, as sub-redes, o security group que é onde estão as regras para permitir os tipos de acesso que queremos dar para as aplicações, por exemplo se criarmos o aplicação de exemplo do ECS com Fargate essa aplicação vai atender a porta 80 por que ele adiciona essa regra na criação.</p>
+<p><strong>Parando o container</strong></p>
+<p>No console Amazon se tentarmos para a Task ele nos dará uma mensagem de que o Service foi iniciado por um processo aotumatizado e que se quisermos parar é necessário atualizar (update) a Service, isso acontece por que quando criamos o ECS ele cria com o um número padrão de Taks's, 1 no caso, então se pararmos o serviço assim ele irpa se reiniciar na sequência, para mudar issso então entramos na parte de Service e atualizamos para 0 o número de Task's.</p>
+<p><strong>Agora fazendo isso pelo CLI.</strong></p>
+<p><a href="https://docs.aws.amazon.com/pt_br/cli/latest/userguide/install-cliv2-linux.html#cliv2-linux-prereq">Instalar CLI AWS Linux</a></p>
+<p>Após a instalação é necessário fazer a configuração através do comando: aws configure</p>
+<p>Aqui será pedido os dados de <strong>Access Key ID</strong>, <strong>Secret Access Key</strong> e <strong>region</strong>; para os dados Access é necessário já ter a configuração de <strong>user</strong> e <strong>security group</strong>.</p>
+<p>Para fazer por linha de comando com cli da <strong>aws</strong> é só usar o comando <strong>update-service --service</strong> e o nome do serviço <strong>--desired-count 0</strong> aqui é atualizado o número para zero igual fizemos no console na página da AWS aqui também podemos incrementar outros valores se quiséssemos aumentar o número de serviços.</p>
+<pre><code class="hljs">aws <span class="hljs-keyword">update</span>-service --service <span class="hljs-keyword">sample</span>-<span class="hljs-keyword">app</span>-service --desired-<span class="hljs-keyword">count</span> 0
+</code></pre>
+<p>Outros comandos no aws cli:</p>
+<pre><code class="hljs"><span class="hljs-string">aws </span><span class="hljs-string">ecs </span><span class="hljs-built_in">list-cluters</span> //<span class="hljs-string">lista </span><span class="hljs-string">clusters
+</span>
+<span class="hljs-string">aws </span><span class="hljs-string">ecs </span><span class="hljs-built_in">list-services</span> //<span class="hljs-string">lista </span><span class="hljs-string">serviç</span><span class="hljs-string">os </span><span class="hljs-string">do </span><span class="hljs-string">cluster </span><span class="hljs-string">default
+</span>
+<span class="hljs-string">aws </span><span class="hljs-string">ecs </span><span class="hljs-built_in">list-services</span> <span class="hljs-built_in">--clister</span> &lt;<span class="hljs-string">nome-do-</span><span class="hljs-string">clister&gt;</span> //<span class="hljs-string">lista </span><span class="hljs-string">os </span><span class="hljs-string">serviç</span><span class="hljs-string">os </span><span class="hljs-string">do </span><span class="hljs-string">cluster </span><span class="hljs-string">com </span>o <span class="hljs-string">nome </span><span class="hljs-string">que </span><span class="hljs-string">for </span><span class="hljs-string">passado
+</span>
+<span class="hljs-string">aws </span><span class="hljs-string">ecs </span><span class="hljs-built_in">list-tasks</span> //<span class="hljs-string">lista </span><span class="hljs-string">tasks
+</span>
+<span class="hljs-string">aws </span><span class="hljs-string">ecs </span><span class="hljs-string">describe-cluters </span>//<span class="hljs-string">info </span><span class="hljs-string">dos </span><span class="hljs-string">cluters </span><span class="hljs-string">mostrando </span><span class="hljs-string">as </span><span class="hljs-string">tarefas </span><span class="hljs-string">em </span><span class="hljs-string">execuç</span>ão
+</code></pre>
+<p><strong>Querys</strong></p>
+<p>Buscando informações de todos os clusters:</p>
+<pre><code class="hljs">aws ecs <span class="hljs-meta">describe</span>-clusters --query <span class="hljs-string">'clusters[*].[clusterNmae,runningTasksCount]'</span> //todos os clusters pegar o nome e <span class="hljs-meta">as</span> tasks rodando
+</code></pre>
+<p>Buscando todas as informações de uma task</p>
+<pre><code class="hljs">aws ecs <span class="hljs-keyword">describe</span>-tasks --<span class="hljs-keyword">cluster</span> &lt;nome-<span class="hljs-keyword">do</span>-<span class="hljs-keyword">cluster</span>&gt; --tasks &lt;id-task&gt; --<span class="hljs-keyword">query</span> 'tasks[*].{cpu:cpu,memoria:<span class="hljs-keyword">memory</span>}'
+</code></pre>
+<p><strong>EC2 Criando ECS</strong></p>
+<p>No console na página da AWS em Clusters clicar em Create Cluster</p>
+<p><img src="/blog-guilherme/blog/assets/cluster-ptI.png" alt=""></p>
+<p>Na próxima tela clicar em EC2 Linux + Networking</p>
+<p><img src="/blog-guilherme/blog/assets/clusterII.png" alt=""></p>
+<p>Aqui definimos o nome do cluster, deixamos a opção On-Demand (onde ele vai cobrar sobre demanda então é bom ter cuidado aqui), escolhemos a EC2 instance type para t2.micro, opção gratuita e Number of instances como 2.</p>
+<p><img src="/blog-guilherme/blog/assets/clusterIII.png" alt=""></p>
+<p>Aqui deixamos o padrão de disco como 22GB e definir a key pair, caso não possua é necessário gerar uma no EC2 Console.</p>
+<p><img src="/blog-guilherme/blog/assets/clusterIV.png" alt=""></p>
+<p>Criando uma key pair no Ec2 console. Clicar em Create Key Pair</p>
+<p><img src="/blog-guilherme/blog/assets/clusterV.png" alt=""></p>
+<p>Escolher o nome da key pair e o tipo, para linux escolher pem e Windows ppk e depois Create key pair</p>
+<p><img src="/blog-guilherme/blog/assets/clusterVI.png" alt=""></p>
+<p>Em Networking podemos escolher a VPC, subnets e security group. Aqui cosneguimos selecionar as que foram criadas por padrão quando criamos o cluster com o Fargate.</p>
+<p><img src="/blog-guilherme/blog/assets/clusterVII.png" alt=""></p>
+<p>E por fim clicar em Create, ele vai fazer toda a configuração.</p>
+<p>Feito tudo isso podemos entrar no console do EC2 e temos todas as configurações feitas e as instâncias no ar, com os volumes configurados, o security group configurado e o auto scaling habilitado, realizando o teste e terminando uma das instâncias demorou em torno de dois minutos mas ele subiu uma nova instância de EC2.</p>
+<p><strong>Provisionando mais instâncias</strong></p>
+<p>No console do EC2 clicando em Auto Scaling Group</p>
+<p><img src="/blog-guilherme/blog/assets/provI.png" alt=""></p>
+<p>Selecionando o grupo e após em Actions e depois Edit</p>
+<p><img src="/blog-guilherme/blog/assets/provII.png" alt=""></p>
+<p>Conseguimos aumentar o número de instâncias</p>
+<p><img src="/blog-guilherme/blog/assets/ecrI.png" alt=""></p>
+<p>Agora fazendo esse processo por linha de comando.</p>
+<pre><code class="hljs"><span class="hljs-string">aws </span><span class="hljs-string">autoscaling </span><span class="hljs-built_in">set-desired-capacity</span> <span class="hljs-built_in">--auto-scaling-group-name</span> <span class="hljs-string">EC2ContainerService-ecs-</span><span class="hljs-string">api-EcsInstanceAsg-</span><span class="hljs-string">3TJFN8LSM6G1 </span><span class="hljs-built_in">--desired-capacity</span> 2
+
+<span class="hljs-string">aws </span><span class="hljs-string">autoscaling </span><span class="hljs-string">describe-auto-</span><span class="hljs-string">scalling-groups </span>//<span class="hljs-string">lista </span><span class="hljs-string">informaç</span>õ<span class="hljs-string">es
+</span></code></pre>
+<p><strong>Elastic Container Registry (ECR)</strong></p>
+<p>É um registry privado de containers Docker da AWS, as imagens são armazenadas com compressão de dados, o que resulta em uma vantagem financeira, já que o serviço é cobrado por espaço utilizado e através do IAM é possível vincular usuários e políticas para implementar controle de acesso ao ECR.</p>
+<ul>
+<li>fazer um pull local de imagem</li>
+</ul>
+<p>docker pull rmerces/api-monolitica</p>
+<ul>
+<li><p>criar um repositório de imagens no ECR</p></li>
+<li><p>No console da AWS no serviço ECS tem no menu do serviço a opção Repository</p></li>
+<li><p>Nele é clicar em criar repository e nomear</p></li>
+<li><p>Comando para fazer o push da imagem</p></li>
+</ul>
+<pre><code class="hljs"><span class="hljs-string">aws </span><span class="hljs-string">ecr </span><span class="hljs-built_in">get-login-password</span> <span class="hljs-built_in">--region</span> <span class="hljs-string">us-east-</span>1 | <span class="hljs-string">docker </span><span class="hljs-string">login </span><span class="hljs-built_in">--username</span> <span class="hljs-string">AWS </span><span class="hljs-built_in">--password-stdin</span> <span class="hljs-string">470106750956.</span><span class="hljs-string">dkr.</span><span class="hljs-string">ecr.</span><span class="hljs-string">us-east-</span>1.<span class="hljs-string">amazonaws.</span><span class="hljs-string">com/</span><span class="hljs-string">api-monolitica </span>//<span class="hljs-string">login </span><span class="hljs-string">no </span><span class="hljs-string">ecr
+</span>
+<span class="hljs-string">docker </span><span class="hljs-string">build </span>-t <span class="hljs-string">api-monolitica </span>. //<span class="hljs-string">buildar </span>a <span class="hljs-string">sua </span><span class="hljs-string">imagem </span><span class="hljs-string">mas </span><span class="hljs-string">no </span><span class="hljs-string">exemplo </span><span class="hljs-string">abaixo </span><span class="hljs-string">usei </span><span class="hljs-string">uma </span><span class="hljs-string">imagem </span><span class="hljs-string">pronta
+</span>
+<span class="hljs-string">docker </span><span class="hljs-string">tag </span><span class="hljs-string">rmerces/</span><span class="hljs-string">api-monolitica:latest </span><span class="hljs-string">470106750956.</span><span class="hljs-string">dkr.</span><span class="hljs-string">ecr.</span><span class="hljs-string">us-east-</span>1.<span class="hljs-string">amazonaws.</span><span class="hljs-string">com/</span><span class="hljs-string">api-monolitica:latest </span>//<span class="hljs-string">usando </span><span class="hljs-string">uma </span><span class="hljs-string">imagem </span><span class="hljs-string">que </span>já <span class="hljs-string">havia </span><span class="hljs-string">feito </span><span class="hljs-string">pull </span><span class="hljs-string">anteriormente
+</span>
+<span class="hljs-string">docker </span><span class="hljs-string">push </span><span class="hljs-string">470106750956.</span><span class="hljs-string">dkr.</span><span class="hljs-string">ecr.</span><span class="hljs-string">us-east-</span>1.<span class="hljs-string">amazonaws.</span><span class="hljs-string">com/</span><span class="hljs-string">api-monolitica:latest </span>//<span class="hljs-string">push </span><span class="hljs-string">da </span><span class="hljs-string">imagem
+</span></code></pre>
+<p>Após no dash dos Repositories aparece a imagem com as suas tags, se houver:</p>
+<p><img src="/blog-guilherme/blog/assets/ecrII.png" alt=""></p>
+<p>Configurar regras para gerenciamento das imagens, clicar em Dry run of lifecycles rules e depois em Add</p>
+<p><img src="/blog-guilherme/blog/assets/ecrIII.png" alt=""></p>
+<p>Aparece a janela de configuração das regras onde Rule Priority é um número para definir as prioridades entre as outras regras criadas, Rule Description é um texto explicativo e Tag prefixes é pra saber em qual tag essa regra deve ser aplicada aqui no exemplo nas tags com prefixo dev</p>
+<p><img src="/blog-guilherme/blog/assets/ecrVI.png" alt=""></p>
+<p>Mais abaixo definimos como 2 no campo onde definimos Image count more than</p>
+<p><img src="/blog-guilherme/blog/assets/ecrV.png" alt=""></p>
+<p>Feito isso aplicamos a nossa regra</p>
+<p><img src="/blog-guilherme/blog/assets/ecrVI.png" alt=""></p>
+<p>E na nossa regra aparece as imagens que são gerenciadas pela regra</p>
+<p><img src="/blog-guilherme/blog/assets/ecrVII.png" alt=""></p>
+<p><strong>Criando Tasks</strong></p>
+<p>As <em>tasks</em> configuram os parâmetros e o ambiente dos <em>containers</em>.</p>
+<p>Gerenciamento de tasks com cli</p>
+<pre><code class="hljs"><span class="hljs-string">aws </span><span class="hljs-string">ecs </span><span class="hljs-built_in">list-tasks</span> <span class="hljs-built_in">--cluster</span> <span class="hljs-string">ecs-api
+</span>
+<span class="hljs-string">aws </span><span class="hljs-string">ecs </span><span class="hljs-string">stop-task </span><span class="hljs-built_in">--taks</span> &lt;<span class="hljs-string">id-task&gt;</span> <span class="hljs-built_in">--cluster</span> &lt;<span class="hljs-string">nome-cluster&gt;</span> //<span class="hljs-string">stop </span><span class="hljs-string">task
+</span>
+<span class="hljs-string">aws </span><span class="hljs-string">ecs </span><span class="hljs-built_in">list-task-definitions</span> //<span class="hljs-string">lista </span><span class="hljs-string">tdoas </span><span class="hljs-string">as </span><span class="hljs-string">definiç</span>õ<span class="hljs-string">es </span><span class="hljs-string">independente </span><span class="hljs-string">do </span><span class="hljs-string">cluster
+</span>
+<span class="hljs-string">aws </span><span class="hljs-string">ecs </span><span class="hljs-string">run-task </span><span class="hljs-built_in">--cluster</span> <span class="hljs-string">ecs-api </span><span class="hljs-built_in">--task-definition</span> <span class="hljs-string">api-monolitica </span>//<span class="hljs-string">rodar </span><span class="hljs-string">uma </span><span class="hljs-string">task </span><span class="hljs-string">associando </span><span class="hljs-string">ao </span><span class="hljs-string">cluster
+</span>
+<span class="hljs-string">aws </span><span class="hljs-string">ecs </span><span class="hljs-string">run-task </span><span class="hljs-built_in">--cluster</span> &lt;<span class="hljs-string">nome-cluter&gt;</span> <span class="hljs-built_in">--task-definition</span> &lt;<span class="hljs-string">nome-task&gt;</span> <span class="hljs-built_in">--count</span> 3 //<span class="hljs-string">subir </span>vá<span class="hljs-string">rias </span><span class="hljs-string">instâ</span><span class="hljs-string">ncias
+</span></code></pre>
+<p>Criando Service</p>
+<ul>
+<li>Escolher como EC2</li>
+<li>Definir a task</li>
+<li>Definir o cluster</li>
+<li>Definir o nome</li>
+<li>Definir o numero de tasks</li>
+</ul>
+<p><img src="/blog-guilherme/blog/assets/service.png" alt=""></p>
+<p>Escolher o load balance</p>
+<p><img src="/blog-guilherme/blog/assets/serviceII.png" alt=""></p>
+<p>Se não tiver um criar</p>
+<p><strong>Criando Load Balance</strong></p>
+<p>Selecionar HTTP/HTTPS</p>
+<p><img src="/blog-guilherme/blog/assets/serviceIII.png" alt=""></p>
+<p>Nomear load balance e configurar a VPC e subnets, no caso usei as padrões criadas no Fargate automaticamente</p>
+<p><img src="/blog-guilherme/blog/assets/serviceIV.png" alt=""></p>
+<p>Adicionar o security group também estou usando o criado automaticamente no Fargate</p>
+<p><img src="/blog-guilherme/blog/assets/serviceV.png" alt=""></p>
+<p>Configurar a rota, portas e etc, nesse caso só dei o nome e deixei mapeado na porta 80</p>
+<p><img src="/blog-guilherme/blog/assets/serviceVI.png" alt=""></p>
+<p>Após configurado o load balance é preciso configurar o target group</p>
+<p><img src="/blog-guilherme/blog/assets/serviceVII.png" alt=""></p>
+<p>Após toda a configuração ainda é necessário configurar o security group pois com essa configuração acima liberamos o load balance na porta 80 e agora precisamos liberar o acesso interno</p>
+<p><img src="/blog-guilherme/blog/assets/serviceVIII.png" alt=""></p>
+<p>Para saber e ver qual é a rede que deve ser liberada basta acessar o serviço de VPC e ver qual IP está associado</p>
+<p><img src="/blog-guilherme/blog/assets/serviceIX.png" alt=""></p>
+<p><strong>Subindo microservices</strong></p>
+<ul>
+<li>Subir três serviços, users, threads e posts usando as imagens em <a href="https://hub.docker.com/u/rmerces">DockerHUB</a></li>
+<li>Criar três repositórios no ECR</li>
+<li>Criar as tasks para cada repositório</li>
+<li>Criar um novo load balance a unica diferença aqui é que quando estamos criando um load balance só conseguimos adicionar um target group e nesse caso teremos três, então criamos o load balance com um e depois no dash do load balance tem a opção target group e ali conseguimos adicionar os demais. E no load balance configuramos os ponteiros.</li>
+<li>Após isso criar o Services</li>
+</ul>
+</span></div></div><div class="blogSocialSection"><div class="blogSocialSectionItem"><a href="https://twitter.com/share" class="twitter-share-button" data-text="AWS ECS" data-url="https://guilhermegarcia86.github.io/blog-guilherme/blog/2020/04/24/post-ecs" data-related="true" data-via="guilherme_ga86" data-show-count="false">Tweet</a></div><div class="blogSocialSectionItem"><div class="fb-like" data-href="https://guilhermegarcia86.github.io/blog-guilherme/blog/2020/04/24/post-ecs" data-layout="standard" data-share="true" data-width="225" data-show-faces="false"></div></div><div class="blogSocialSectionItem"><div class="fb-comments" data-href="https://guilhermegarcia86.github.io/blog-guilherme/blog/2020/04/24/post-ecs" data-width="100%" data-numposts="5" data-order-by="time"></div></div></div></div><div class="blog-recent"><a class="button" href="/blog-guilherme/blog/">Recent Posts</a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/blog-guilherme/" class="nav-home"><img src="/blog-guilherme/img/dog.png" alt="Tutoriais" width="66" height="58"/></a><div><h5>Community</h5><a href="https://stackoverflow.com/questions/tagged/docusaurus" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://twitter.com/guilherme_ga86" target="_blank" rel="noreferrer noopener">Twitter</a></div><div><h5>More</h5><a href="/blog-guilherme/blog">Blog</a><a href="https://github.com/">GitHub</a><a class="github-button" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a><div class="social"><div class="fb-like" data-href="https://guilhermegarcia86.github.io" data-colorscheme="dark" data-layout="standard" data-share="true" data-width="225" data-show-faces="false"></div></div></div></section><section class="copyright">Copyright © 2020</section></footer></div><script>window.fbAsyncInit = function() {FB.init({appId:'524104774884756',xfbml:true,version:'v2.7'});};(function(d, s, id){var js, fjs = d.getElementsByTagName(s)[0];if (d.getElementById(id)) {return;}js = d.createElement(s); js.id = id;js.src = '//connect.facebook.net/en_US/sdk.js';fjs.parentNode.insertBefore(js, fjs);}(document, 'script','facebook-jssdk'));
+                </script><script>window.twttr=(function(d,s, id){var js,fjs=d.getElementsByTagName(s)[0],t=window.twttr||{};if(d.getElementById(id))return t;js=d.createElement(s);js.id=id;js.src='https://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js, fjs);t._e = [];t.ready = function(f) {t._e.push(f);};return t;}(document, 'script', 'twitter-wjs'));</script></body></html>
