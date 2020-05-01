@@ -13,7 +13,7 @@ Aqui faremos só o backend da aplicação e futuramente desenvolveremos o fronte
 
 ## Criando a aplicação Spring Boot
 
-Para isso vamos usar o [Spring Initalizr](https://start.spring.io/), entrando na página escolhemos como queremos iniciar o projeto, aqui eu irei usar o *Spring Web* para poder fazer requisições *Rest*, o *Spring Data MongoDB*, que já nos auxilia fornecendo uma interface para as consultas e os codecs para trabalharmos com os objetos Java e o Mongo, também estou usando *Lombok* e *Spring DevTools* mas são mais pela facilidade que o *Lombok* fornece quando criarmos os nossos **POJOs** e o *DevTools* para podermos usar em desenvolvimento e termos o live reload da aplicação.
+Para isso vamos usar o [Spring Initalizr](https://start.spring.io/), entrando na página escolhemos como queremos iniciar o projeto, aqui eu irei usar o *Spring Web* para poder fazer requisições *Rest*, também estou usando *Lombok* e *Spring DevTools* mas são mais pela facilidade que o *Lombok* fornece quando criarmos os nossos **POJOs** e o *DevTools* para podermos usar em desenvolvimento e termos o live reload da aplicação.
 Então fica mais ou menos assim o projeto:
 ![](assets/spring-initializr.png)
 
@@ -28,13 +28,41 @@ Após isso também precisamos adicionar ao projeto a dependência do **google-se
 
 ```
 
+Também adicione o driver do Mongo ao pom.
+```xml
+<dependency>
+    <groupId>org.mongodb</groupId>
+    <artifactId>mongo-java-driver</artifactId>
+</dependency>
+```
+
 ## Descrição da aplicação
 
 Vamos emular uma rede entregas de alimentos, onde os estabelecimentos estão cadastrados e quando um usuário digitar o seu endereço e ele irá exibir os mais próximos dele.
 
 ## Model
 
-Vamos começar o nosso model com o que seria então o **Estabelecimento** ele possuirá *nome*, *email*, *endereço* e a sua *localização*
+Vamos começar o nosso model com o que seria então o **Estabelecimento** ele possuirá *nome*, *email* e a sua *localização*. Então vou começar criando a classe **Localizacao**.
+
+```java
+package com.challenge.geolocation.model;
+
+import java.util.List;
+
+import lombok.Data;
+
+@Data
+public class Localizacao {
+	
+	private String endereco;
+    private List<Double> coordinates;    
+    private String type = "Point";
+
+}
+```
+
+Aqui temos o endereço mas também temos dois atributos que podem parecer um pouco estranhos o *coordinates* e o *type*. Os dois são necessários quando estamos trabalhando com geolocalização com o Mongo, o primeiro valor *coordinates* é uma lista de **double** contendo a latitude e longitude e o *type* diz respeito a um ponto no mapa, podemos ter outros *types* como **Polygon**.
+Agora criando a nossa classe do estabelecimento propriamente dita.
 
 ```java
 package com.challenge.geolocation.model;
@@ -45,131 +73,203 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.Data;
 
+package com.challenge.geolocation.model;
+
+import org.bson.types.ObjectId;
+
+import lombok.Data;
+
 @Data
-@Document(collection = "estabelecimento")
-public class Estabelecimento {
-	
-	@Id
-	private String id;
+public class Estabelecimento{
+
+	private ObjectId id;
 
 	private String nome;
 	private String email;
-	private String endereco;
-	
-	/**
-	 * {@code location} is stored in GeoJSON format.
-	 *
-	 * <pre>
-	 * <code>
-	 * {
-	 *   "type" : "Point",
-	 *   "coordinates" : [ x, y ]
-	 * }
-	 * </code>
-	 * </pre>
-	 */
-	private GeoJsonPoint location;
+	private Localizacao localizacao;	
 	
 }
 
 ```
 
-Com o uso do *lombok* conseguios reduzir um pouco a verbozidade e com a classe **GeoJsonPoint** conseguimos abstrair detalhes de implementação, pois o **Mongo** exige que para geolocalização exista um array chamados *coordinates* e que seja especificado o seu *type* que nesse caso usamos o **Point** pois é o que representa melhor o que queremos que é justamente um ponto em um mapa.
+Temos aqui a classe **Estabelecimento** composta pela classe **Localizacao** e com os atributos *id* que representa o **ObjectId** do **MongoDB**, o nome e o email, podemos perceber como o uso do *lombok* nos ajuda a reduzir um pouco a verbozidade.
 
-**Existem outros tipos como Polygon por exemplo*
+## Codecs
 
-Criado o nosso model iremos já fazer o inserção desses valores no Mongo:
-
-```json
-
-{
-    "nome" : "Mercado I",
-    "email" : "contato@mercadoI.com",
-    "endereco" : "Rua Brigadeiro Tobias n 780",
-    "location" : {
-        "latitude" : -23.53624,
-        "longitude" : -46.63395
-    }
-}
-
-{
-    "nome" : "Mercado II",
-    "email" : "mercadoII@contato.com",
-    "endereco" : "R. Brg. Tobias, 206 - Santa Ifigênia, São Paulo - SP, 01032-000",
-    "location" : {
-        "latitude" : -23.54165,
-        "longitude" : -46.63583
-    }
-}
-
-{
-    "nome" : "Mercado III",
-    "email" : "mercadoIII@contato.com",
-    "endereco" : "Av. Cásper Líbero, 42 - Centro Histórico De São Paulo, São Paulo - SP, 01033-000",
-    "location" : {
-        "latitude" : -23.54132,
-        "longitude" : -46.63643
-    }
-}
-
-{
-    "nome" : "Mercado IV",
-    "email" : "mercadoIV@contato.com",
-    "endereco" : "Av. Rio Branco, 630 - República, São Paulo - SP, 01205-000",
-    "location" : {
-        "latitude" : -23.53984,
-        "longitude" : -46.64008
-    }
-}
-
-{
-    "nome" : "Mercado V",
-    "email" : "mercadoV@contato.com",
-    "endereco" : "Alameda Barão de Limeira, 425 - Campos Elíseos, São Paulo - SP, 01202-900",
-    "location" : {
-        "latitude" : -23.53386,
-        "longitude" : -46.6482
-    }
-}
-
-{
-    "nome" : "Mercado VI",
-    "email" : "mercadoVI@contato.com",
-    "endereco" : "R. Canuto do Val, 41 - Santa Cecilia, São Paulo - SP, 01224-040",
-    "location" : {
-        "latitude" : -23.54062,
-        "longitude" : -46.65114
-    }
-}
-```
-
-Agora já temos o modelo mapeado na aplicação e os dados no banco de dados.
-
-
-## Repository
-
-Agora passamos para o **Repository** responsável por conter os métodos que farão as consultas e manipulações no nosse schema de dados:
+Agora temos o *Model* criado mas precisamos fazer de alguma forma pra que a nossa aplicação se comunique com o *Mongo*. Aí entra os *codecs*, ele vai ser o responsável por fazer tanto o envio como o recebimento dos objetos do *Mongo*.
+Então vamos criar a classe **EstabelecimentoCodec** que implementa a interface **CollectibleCodec** do tipo **Estabelecimento**:
 
 ```java
-package com.challenge.geolocation.repository;
+package com.challenge.geolocation.codec;
 
-import java.util.List;
-
-import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import org.bson.BsonReader;
+import org.bson.BsonValue;
+import org.bson.BsonWriter;
+import org.bson.codecs.CollectibleCodec;
+import org.bson.codecs.DecoderContext;
+import org.bson.codecs.EncoderContext;
 
 import com.challenge.geolocation.model.Estabelecimento;
 
-@Repository
-public interface EstabelecimentoRepository extends CrudRepository<Estabelecimento, String> {
-	
-	List<Estabelecimento> findByLocationWithin(GeoJsonPoint location);
-	
+public class EstabelecimentoCodec implements CollectibleCodec<Estabelecimento>{
+
+	@Override
+	public void encode(BsonWriter writer, Estabelecimento value, EncoderContext encoderContext) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Class<Estabelecimento> getEncoderClass() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Estabelecimento decode(BsonReader reader, DecoderContext decoderContext) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Estabelecimento generateIdIfAbsentFromDocument(Estabelecimento document) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean documentHasId(Estabelecimento document) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public BsonValue getDocumentId(Estabelecimento document) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
-
-
 ```
 
-Como estamos usando *Spring Data* basta criarmos uma *interface* e aqui estendemos da classe **CrudRepository** e definimos o seu tipo como sendo do nosso modelo mapeado e qual o seu id no caso *String* e fazendo uso da feature de *query methods* adicionamos a nossa consulta por geolocalização.
+Agora precisamos começar a implementar o codec a nossa maneira para ele poder fazer o encod e o decode, para isso vamos adicionar a classe **Codec** do pacote *bson* que nos ajuda, vamos tipa-la como um **Document** e vamos adicioná-lo ao construtor para ele ficar como dependência do nosso *codec*:
 
+```java
+import org.bson.Document;
+import org.bson.codecs.Codec;
+
+import com.challenge.geolocation.model.Estabelecimento;
+
+
+public class EstabelecimentoCodec implements CollectibleCodec<Estabelecimento>{
+	
+	private Codec<Document> codec;
+	
+	public EstabelecimentoCodec(Codec<Document> codec) {
+		this.codec = codec;
+	}
+```
+Agora vamos implementar o método responsável por fazer o encode. Aqui é onde dizemos como serão salvo os nossos objetos em Java para um objeto do Mongo:
+```java
+@Override
+public void encode(BsonWriter writer, Estabelecimento estabelecimento, EncoderContext encoder) {
+    Document document = new Document();
+    
+    document.put("_id", estabelecimento.getId());
+    document.put("nome", estabelecimento.getNome());
+    document.put("email", estabelecimento.getEmail());
+    
+    Localizacao localizacao = estabelecimento.getLocalizacao();
+    
+    List<Double> coordinates = new ArrayList<>();
+    localizacao.getCoordinates().forEach(coordinates::add);
+    
+    document.put("localizacao", new Document()
+            .append("endereco", localizacao.getEndereco())
+            .append("coordinates", coordinates)
+            .append("type", localizacao.getType()));
+    
+    codec.encode(writer, document, encoder);
+}
+```
+
+E aqui é onde impletamos o decode, como o Java vai interpretar o objeto retornado do Mongo:
+```java
+@Override
+public Estabelecimento decode(BsonReader reader, DecoderContext decoderContext) {
+    
+    Document document = codec.decode(reader, decoderContext);
+    
+    Estabelecimento estabelecimento = new Estabelecimento();
+    estabelecimento.setId(document.getObjectId("_id"));
+    estabelecimento.setNome(document.getString("nome"));
+    estabelecimento.setEmail(document.getString("email"));
+    
+    Document localizacao = (Document) document.get("localizacao");
+    if(localizacao != null) {
+        String endereco = localizacao.getString("endereco");
+        @SuppressWarnings("unchecked")
+        List<Double> coordinates = (List<Double>) localizacao.get("coordinates");
+        
+        Localizacao localizacaoEntity = new Localizacao();
+        localizacaoEntity.setEndereco(endereco);
+        localizacaoEntity.setCoordinates(coordinates);
+        
+        estabelecimento.setLocalizacao(localizacaoEntity);
+    }
+    
+    return estabelecimento;
+}
+```
+
+E temos os outros métodos que implementamos para que o codec consiga fazer a gerência dos objetos:
+```java
+@Override
+public Class<Estabelecimento> getEncoderClass() {
+    return Estabelecimento.class;
+}
+
+@Override
+public Estabelecimento generateIdIfAbsentFromDocument(Estabelecimento estabelecimento) {
+    return documentHasId(estabelecimento) ? estabelecimento.generateId() : estabelecimento;
+}
+
+@Override
+public boolean documentHasId(Estabelecimento estabelecimento) {
+    return estabelecimento.getId() == null;
+}
+
+@Override
+public BsonValue getDocumentId(Estabelecimento estabelecimento) {
+    if (!documentHasId(estabelecimento)) {
+        throw new IllegalStateException("This Document do not have a id");
+    }
+    
+    return new BsonString(estabelecimento.getId().toHexString());
+}
+```
+
+A única coisa aqui a ressaltar foi a criação do método *generateId* no model **Estabelecimento** que fica assim:
+```java
+package com.challenge.geolocation.model;
+
+import org.bson.types.ObjectId;
+
+import lombok.Data;
+
+@Data
+public class Estabelecimento{
+
+	private ObjectId id;
+
+	private String nome;
+	private String email;
+	private Localizacao localizacao;	
+	
+	public Estabelecimento generateId() {
+		this.setId(new ObjectId());
+		return this;
+	}
+	
+}
+```
