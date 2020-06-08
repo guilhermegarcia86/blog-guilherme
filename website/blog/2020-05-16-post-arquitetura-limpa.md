@@ -34,7 +34,7 @@ A ideia é que com uma boa arquitetura o custo para mudanças não alto, que uma
 
 ## Arquitetura limpa
 
-Com esses conceitos em mente por volta de 2012 Robert C. Martin (Uncle Bob) criou a Arquitetura Limpa, um estilo com similaridades com a Arquitetura Cebola e Arquitetura Hexagonal.
+Com esses conceitos em mente por volta de 2012 Robert C. Martin (Uncle Bob) criou a Arquitetura Limpa, um estilo com similaridades com a Arquitetura Cebola ec Arquitetura Hexagonal.
 
 ### O que resolve?
 
@@ -83,3 +83,271 @@ Camada que tem como finalidade converter dados da maneira mais acessível e conv
 # Frameworks e Drivers
 Contém qualquer frameworks ou ferramentas para poder rodar na aplicação.
 
+## Exemplo prático
+
+Ápos toda a teoria vamos mostrar na prática com um projeto simples onde teremos três pontos de entrada da aplicação.
+
+Com o desenrolar do projeto vamos perceber que nesse modelo arquitetural o mais importante são as camadas mais internas e as mais externas serão tratados como detalhe e é aí que mora a quebra de tabu da Arquitetura Limpa, pois o foco é no negócio e não nas tecnologias; mas ainda estamos trabalhando com um sistema automatizado e precisamos seguir alguns paradigmas, mas só o que é realmente indispensável.
+
+Vamos fazer um projeto de cadastro de **Power Rangers**, nele um usuário vai enviar os seus dados e a aplicação irá criar um Ranger de uma cor dependendo de algumas características.
+
+Vamos usar a linguagem **Java** como um projeto modular **Maven** e a partir dele conseguimos modularizar as nossas camadas.
+
+## Criando projeto
+
+Dentro do nosso diretória vmos criar um arquivos _pom.xml_, esse arquivos vai ser o raiz da nossa aplicação, é nele que teremos as dependências declaradas com suas versões que usuaremos e também teremos aqui a declaração dos nossos módulos, segue o exemplo:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.gogo.powerrangers</groupId>
+	<artifactId>clean-architecture-example</artifactId>
+	<packaging>pom</packaging>
+	<version>1.0</version>
+	<modules>
+		<module>entity</module>
+	</modules>
+
+	<properties>
+		<revision>1.0</revision>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>11</java.version>
+		<lombok-version>1.18.10</lombok-version>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<junit-jupiter.version>5.5.1</junit-jupiter.version>
+		<junit-platform>1.5.1</junit-platform>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+
+			<!-- Jupiter -->
+			<dependency>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter-api</artifactId>
+				<version>${junit-jupiter.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter-engine</artifactId>
+				<version>${junit-jupiter.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.junit.platform</groupId>
+				<artifactId>junit-platform-launcher</artifactId>
+				<version>${junit-platform}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.junit.platform</groupId>
+				<artifactId>junit-platform-runner</artifactId>
+				<version>${junit-platform}</version>
+				<scope>test</scope>
+			</dependency>
+
+		</dependencies>
+	</dependencyManagement>
+
+
+</project>
+```
+
+Aqui temos o mínimo para começar, temos a declaração da versão do java, o **JUnit** que será o nosso framework de testes unitários e temos a declaração do nosso primeiro módulo chamado _entity_.
+
+## Entidade
+
+Agora vamos para a nossa entidade, esse é o ponto mais ao centro e mais acima do nosso projeto, dentro dele devemos ter os nossos objetos de domínio e regras de negócio que podem viver sem um sistema automatizado. Esse é o módulo que será visto por todos os outros mas não conhece os demais, ele é totalmente isolado de dependências externas.
+
+Então pensando no nosso projeto aqui modelamos o nosso domínio de ususários, onde vamos ter o nome, email, idade, personalidade e o nome do ranger que será criado.
+
+Vamos criar um diretório onde está o nosso _pom_ raiz com o nome de _entity_ e dentro dele vamos criar o _pom.xml_ da nossa _entity_:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<parent>
+		<artifactId>clean-architecture-example</artifactId>
+		<groupId>com.gogo.powerrangers</groupId>
+		<version>1.0</version>
+	</parent>
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>entity</artifactId>
+	<version>${revision}</version>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>11</source>
+					<target>11</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+
+		<!-- Jupiter -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-launcher</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-runner</artifactId>
+		</dependency>
+
+	</dependencies>
+
+</project>
+```
+
+Podemos ver que nesse pom temos somente a versão do Java e o JUnit que nos ajudará a fazer os testes unitários.
+
+Vamos criar a nosso primeira classe de domínio que chamaremos de **User** e vamos ter os atributos que definimos do nosso usuários:
+
+```java
+package com.gogo.powerrangers.entity;
+
+public class User {
+
+    private final String name;
+    private final String email;
+    private final int age;
+    private final Personality personality;
+    private final String ranger;
+
+    User(String name, String email, int age, Personality personality, String ranger) {
+        this.name = name;
+        this.email = email;
+        this.age = age;
+        this.personality = personality;
+        this.ranger = ranger;
+    }
+
+    public String getRanger() {
+        return ranger;
+    }
+    public String getName() {
+        return name;
+    }
+    public String getEmail() {
+        return email;
+    }
+    public int getAge() {
+        return age;
+    }
+    public Personality getPersonality() {
+        return personality;
+    }
+}
+```
+
+Temos aqui a nossa entidade e colocamos um **Enum** pra Personalidade e um construtor com acessibilidade _package default_ que é um construtor que só pode ser acessado dentro do pacote onde ele foi declarado e criamos apenas os _getters_.
+
+Agora temos a nossa entidade que é um **POJO** e vamos adicionar nesse projeto a regra de negócio que pode viver sem existir uma aplicação.
+
+No universo dos **Power Rangers** cada ranger é escolhido de acordo com a sua personalidade, pra cada tipo de personalidade uma cor diferente e essa regra é independente de existir um software ou não, é uma regra dos **Power Rangers** então essa regra pertence a **Entidade**.
+
+Pra isso eu vou separar essa definição para acontecer no momento em que um usuário for criado, então vamos usar um padrão de **Builder** para criar o nosso usuário e definir qual a cor do ranger de acordo com a sua pernsonalidade:
+
+```java
+package com.gogo.powerrangers.entity;
+
+public final class UserBuilder {
+
+    private String name;
+    private String email;
+    private int age;
+    private Personality personality;
+    private String ranger;
+
+    UserBuilder() {
+    }
+
+    public UserBuilder name(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public UserBuilder email(String email) {
+        this.email = email;
+        return this;
+    }
+
+    public UserBuilder age(int age) {
+        this.age = age;
+        return this;
+    }
+
+    public UserBuilder personality(String personality) {
+        this.personality = Personality.of(personality);
+        this.ranger = this.discoverRanger(this.personality);
+        return this;
+    }
+
+    public User build() {
+        return new User(this.name, this.email, this.age, this.personality, this.ranger);
+    }
+
+    private String discoverRanger(Personality personality) {
+        switch (personality) {
+            case LIDERANCA:
+                return "Vermelho";
+
+            case ENTUSIASMO:
+                return "Preto";
+
+            case TRANQUILIDADE:
+                return "Amarelo";
+
+            case INTELIGENCIA:
+                return "Azul";
+
+            case RIQUEZA:
+                return "Rosa";
+
+            case PERSISTENCIA:
+                return "Verde";
+
+            case FORCA:
+                return "Branco";
+
+            default:
+                return "";
+        }
+    }
+}
+
+```
+
+Aqui temos a criação de um **User** e já temos a definição da cor do ranger de acordo com a personalidade, vamos também adicionar o nosso builder dentro da nossa classe **User**:
+```java
+    public static UserBuilder builder() {
+        return new UserBuilder();
+    }
+```
+
+## Casos de uso
