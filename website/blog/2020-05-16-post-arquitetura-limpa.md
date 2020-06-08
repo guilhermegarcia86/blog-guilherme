@@ -351,3 +351,466 @@ Aqui temos a criação de um **User** e já temos a definição da cor do ranger
 ```
 
 ## Casos de uso
+
+Agora que criamos a nossa entidade vamos criar a próxima camada que são os Casos de Uso. Nem toda regra de negócio é pura como a regra de negócio que está na Entidade, algumas regras de negócio fazem sentido existirem em um sistema automatizado, software, e é aqui que eles são usados, nos Casos de Uso, aqui faremos validações, controle de fluxo e temos as portas de comunicação com os adapatadores, como no caso de persistência de dados.
+
+Então vamos criar um novo diretório chamado _usecase_ e nele teremos um arquivo _pom.xml_:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>clean-architecture-example</artifactId>
+        <groupId>com.gogo.powerrangers</groupId>
+        <version>1.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>usecase</artifactId>
+    <version>${revision}</version>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>com.gogo.powerrangers</groupId>
+            <artifactId>entity</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <!-- Unit Test -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-runner</artifactId>
+        </dependency>
+    </dependencies>
+</project>
+```
+
+Aqui temos a dependência da _entity_ e vamos criar o nosso primeiro caso de uso, a criação de um usuário. Criamos uma classe com nome **CreateUser** com um método create que irá receber um **User** e irá aplicar as validações necessárias para criar um usuário e iremos persistir essa informação em algum lugar. Não especificamos onde iremos persistir pois aqui isso é um mero detalhe que não é da preocupação dos Casos de Uso, podemos usar **JDBC** puro, **Spring Data**, cache em memória ou arquivo de texto essa responsabilidade não nos interessa aqui.
+
+```java
+package com.gogo.powerrangers.usecase;
+
+import com.gogo.powerrangers.entity.User;
+
+public class CreateUser {
+
+    public CreateUser() {
+        
+    }
+
+    public User create(final User user) {
+
+
+        return user;
+    }
+}
+```
+
+Vamos adicionar primeiramente a nossa validação, aqui vamos imaginar que o usuário não pode ser menor de 18 anos e não pode ser repetido e iremos verificar pelo email essa informação.
+Vamos criar uma classe chamada **UserValidator**:
+
+```java
+package com.gogo.powerrangers.usecase.validator;
+
+import com.gogo.powerrangers.entity.User;
+import com.gogo.powerrangers.usecase.exception.PowerRangerNotFoundException;
+import com.gogo.powerrangers.usecase.exception.UserValidationException;
+
+import static java.util.Objects.isNull;
+
+public class UserValidator {
+
+    public static void validateCreateUser(final User user) {
+        if(isNull(user)) {
+            throw new UserValidationException("Usuario nao pode ser null");
+        }
+        if(user.getAge() < 18) {
+            throw new UserValidationException("Usuario deve ser maior de 18 anos");
+        }
+        if(user.getPersonality().getPersonality().isEmpty()){
+            throw new PowerRangerNotFoundException("Power Ranger não localizado com personalidade informada");
+        }
+    }
+}
+```
+Aqui temos a nossa validação e customizamos as nossas **Exceptions** com a **UserValidationException** e a **PowerRangerNotFoundException**, em seguida acionamos o nosso método estático a nossa classe de criação de usuário:
+```java
+package com.gogo.powerrangers.usecase;
+
+import com.gogo.powerrangers.entity.User;
+import com.gogo.powerrangers.usecase.exception.UserAlreadyExistsException;
+import com.gogo.powerrangers.usecase.validator.UserValidator;
+
+public class CreateUser {
+
+    private final UserRepository repository;
+
+    public CreateUser(UserRepository repository) {
+        this.repository = repository;
+    }
+
+    public User create(final User user) {
+
+        UserValidator.validateCreateUser(user);
+        if (repository.findByEmail(user.getEmail()).isPresent()) {
+            throw new UserAlreadyExistsException(user.getEmail());
+        }
+
+        return user;
+    }
+}
+
+```
+
+Pronto temos a nosa validação e agora precisamos de alguma forma informar que queremos persistir essa informação, porém como fazer isso se os drivers e frameworks estão na camada mais externa e a ideia aqui é deixar o Caso de Uso desacoplado de deles?
+
+Usaremos _interfaces_ e inversão de controle, trocando em miúdos vamos dizer na nossa classe **CreateUser** que queremos salvar um usuário mas como ele será salvo já não nos importa.
+
+Então vamos criar a interface **UserRepository** com os métodos que queremos:
+```java
+package com.gogo.powerrangers.usecase.port;
+
+import com.gogo.powerrangers.entity.User;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface UserRepository {
+
+    User create(User user);
+
+    Optional<User> findByEmail(String email);
+
+    Optional<List<User>> findAllUsers();
+}
+```
+O resultado final da **CreateUser** fica:
+```java
+package com.gogo.powerrangers.usecase;
+
+import com.gogo.powerrangers.entity.User;
+import com.gogo.powerrangers.usecase.exception.UserAlreadyExistsException;
+import com.gogo.powerrangers.usecase.port.UserRepository;
+import com.gogo.powerrangers.usecase.validator.UserValidator;
+
+public class CreateUser {
+
+    private final UserRepository repository;
+
+    public CreateUser(UserRepository repository) {
+        this.repository = repository;
+    }
+
+    public User create(final User user) {
+
+        UserValidator.validateCreateUser(user);
+        if (repository.findByEmail(user.getEmail()).isPresent()) {
+            throw new UserAlreadyExistsException(user.getEmail());
+        }
+
+        var createdUser = repository.create(user);
+
+        return createdUser;
+    }
+}
+```
+
+## Adaptadores de interface
+
+Nessa camada podemos ver que exitem os nossos **Controllers**, **Gateways** e **Presenters**, aqui temos a comunicação pra dentro das nossa **Entidades** mas também a comunicação externa e representação do objeto de retorno que será exposto.
+
+Vamos criar um diretório chamado _adapter_ e dentro dele outro diretório chamado _controller_ e um arquivos _pom.xml_ que terá como dependência a _entity_ e aa _usecase_:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>clean-architecture-example</artifactId>
+        <groupId>com.gogo.powerrangers</groupId>
+        <version>1.0</version>
+        <relativePath>../../../clean-architecture-example/pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>controller</artifactId>
+    <version>${revision}</version>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>com.gogo.powerrangers</groupId>
+            <artifactId>entity</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gogo.powerrangers</groupId>
+            <artifactId>usecase</artifactId>
+            <version>${revision}</version>
+        </dependency>
+</project>
+```
+
+Vamos começar aqui criando o nosso objeto de resposta da nossa aplicação, não queremos que a nossa entidade seja retornada aqui pois caso a apresentação seja alterada temos um ponto unico de alteração e podemos ainda aqui realizar qualquer transformação que seja importante para exibição. Então criamos a classe **UserModel**:
+```java
+package com.gogo.powerrangers.model;
+
+import com.gogo.powerrangers.entity.User;
+
+public class UserModel {
+
+    private String name;
+    private String email;
+    private int age;
+    private String personality;
+    private String ranger;
+
+    public static UserModel mapToUserModel(User user) {
+
+        var userModel = new UserModel();
+        userModel.name = user.getName();
+        userModel.email = user.getEmail();
+        userModel.age = user.getAge();
+        userModel.personality = user.getPersonality().getPersonality();
+        userModel.ranger = user.getRanger();
+
+        return userModel;
+    }
+
+    public static User mapToUser(UserModel userModel) {
+        //@formatter:off
+        return User.builder().name(userModel.getName())
+                             .age(userModel.getAge())
+                             .email(userModel.getEmail())
+                             .personality(userModel.getPersonality())
+                             .build();
+        //@formatter:on
+    }
+
+    @Override
+    public String toString() {
+        return "UserModel{" +
+                "name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", age=" + age +
+                ", personality='" + personality + '\'' +
+                ", ranger='" + ranger + '\'' +
+                '}';
+    }
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public int getAge() {
+		return age;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
+	}
+
+	public String getPersonality() {
+		return personality;
+	}
+
+	public void setPersonality(String personality) {
+		this.personality = personality;
+	}
+
+	public String getRanger() {
+		return ranger;
+	}
+
+	public void setRanger(String ranger) {
+		this.ranger = ranger;
+	}
+}
+```
+
+Aqui temos os métodos que fazem a mudança de _Model-to-User_ e _User-to-Model_ e agora vamos criar o nosso controlador:
+```java
+package com.gogo.powerrangers;
+
+import com.gogo.powerrangers.model.UserModel;
+import com.gogo.powerrangers.usecase.CreateUser;
+
+public class UserController {
+
+    private final CreateUser createUser;
+
+    public UserController(CreateUser createUser){
+        this.createUser = createUser;
+    }
+
+    public UserModel createUser(UserModel userModel){
+
+        var user = createUser.create(UserModel.mapToUser(userModel));
+
+        return UserModel.mapToUserModel(user);
+    }
+}
+```
+
+## Frameworks e Drivers
+Aqui é a nossa última camada, aqui temos os **Drivers**, **Frameworks**, **UI** e qualquer **Dispositivo** ou chamada externa em nossa aplicação é a camada mais "suja" pois é aqui temos a entrada da nossa aplicação, ela conhece todas as outras camadas porém não é conhecida por nenhuma. 
+
+Qual o benefício disso?
+
+O benefício é que com isso temos uma aplicação altamente desacoplada, as camadas mais internas não tem conhecimento de como a aplicação é executada, se estamos usando uma aplicaçãoWeb, linha de comando, desktop e etc, isso torna a aplicação plugavel de qualquer framework ou driver, contanto que ele siga a contrato, _interface_, que definimos na camada de **Caso de Uso**.
+
+Aqui vamos criar três pontos de entrada, um com **Java** puro executando por terminal e com um banco em memória, outro com **Spring Boot** e persistência com **JDBC Template** e outro com **VertX** e **Hibernate**.
+
+Começando pela aplicação **Java** puro exeutado pelo terminal. Vamos criar um dirtório dentro de _adapter_ chamado _repository_ e dentro dele outro repositório chamado _in-memory-db_ e dentro dele um arquivo _pom.xm_:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>clean-architecture-example</artifactId>
+        <groupId>com.gogo.powerrangers</groupId>
+        <version>1.0</version>
+        <relativePath>../../../../clean-architecture-example/pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>in-memory-db</artifactId>
+    <version>${revision}</version>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>com.gogo.powerrangers</groupId>
+            <artifactId>entity</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gogo.powerrangers</groupId>
+            <artifactId>usecase</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <!-- Unit Test -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-runner</artifactId>
+        </dependency>
+    </dependencies>
+</project>
+```
+
+E vamos criar a classe **InMemoryUserRepository** que implementa **UserRepository**:
+```java
+package com.gogo.powerrangers.db;
+
+import com.gogo.powerrangers.entity.User;
+import com.gogo.powerrangers.usecase.port.UserRepository;
+
+import java.util.*;
+
+public class InMemoryUserRepository implements UserRepository {
+
+    private final Map<String, User> inMemoryDb = new HashMap<>();
+
+    @Override
+    public User create(User user) {
+        inMemoryDb.put(user.getEmail(), user);
+        return user;
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return inMemoryDb.values().stream().filter(user -> user.getEmail().equals(email)).findAny();
+    }
+
+    @Override
+    public Optional<List<User>> findAllUsers() {
+        return Optional.of(new ArrayList<>(inMemoryDb.values()));
+    }
+}
+```
+E aqui temos um **Map** e simulamos em cache as operações de persistência.
