@@ -707,15 +707,17 @@ public class UserController {
 ```
 
 ## Frameworks e Drivers
-Aqui é a nossa última camada, aqui temos os **Drivers**, **Frameworks**, **UI** e qualquer **Dispositivo** ou chamada externa em nossa aplicação é a camada mais "suja" pois é aqui temos a entrada da nossa aplicação, ela conhece todas as outras camadas porém não é conhecida por nenhuma. 
+Aqui é a nossa última camada, aqui temos os **Drivers**, **Frameworks**, **UI** e qualquer **Dispositivo** ou chamada externa em nossa aplicação é a camada mais "suja" pois é aqui que temos a entrada da nossa aplicação, ela conhece todas as outras camadas porém não é conhecida por nenhuma. 
 
-Qual o benefício disso?
+### Qual o benefício disso?
 
-O benefício é que com isso temos uma aplicação altamente desacoplada, as camadas mais internas não tem conhecimento de como a aplicação é executada, se estamos usando uma aplicaçãoWeb, linha de comando, desktop e etc, isso torna a aplicação plugavel de qualquer framework ou driver, contanto que ele siga a contrato, _interface_, que definimos na camada de **Caso de Uso**.
+O benefício é que com isso temos uma aplicação altamente desacoplada, as camadas mais internas não tem conhecimento de como a aplicação é executada, se estamos usando uma aplicação Web, linha de comando, desktop e etc, isso torna a aplicação plugável a qualquer framework ou driver, contanto que ele siga a contrato, _interface_, que definimos na camada de **Caso de Uso**.
 
 Aqui vamos criar três pontos de entrada, um com **Java** puro executando por terminal e com um banco em memória, outro com **Spring Boot** e persistência com **JDBC Template** e outro com **VertX** e **Hibernate**.
 
-Começando pela aplicação **Java** puro exeutado pelo terminal. Vamos criar um dirtório dentro de _adapter_ chamado _repository_ e dentro dele outro repositório chamado _in-memory-db_ e dentro dele um arquivo _pom.xm_:
+### Aplicação Java executada pelo terminal
+
+Começando pela aplicação **Java** puro executado pelo terminal. Dentro do diretório _adapter_ vamos criar um outro diretório chamado _repository_ e dentro dele outro diretório chamado _in-memory-db_ e dentro dele um arquivo _pom.xm_:
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -814,3 +816,590 @@ public class InMemoryUserRepository implements UserRepository {
 }
 ```
 E aqui temos um **Map** e simulamos em cache as operações de persistência.
+
+Agora vamos criar um diretório a partir do nosso diretório raiz chamada _application_ e dentro desse repositório um diretórioa chamadp _manual-app_ e dentro dele um _pom.xml_:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>clean-architecture-example</artifactId>
+        <groupId>com.gogo.powerrangers</groupId>
+        <version>1.0</version>
+        <relativePath>../../../clean-architecture-example/pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>manual-app</artifactId>
+    <version>${revision}</version>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <!-- Build an executable JAR -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>com.gogo.powerrangers.Main</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>com.gogo.powerrangers</groupId>
+            <artifactId>entity</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gogo.powerrangers</groupId>
+            <artifactId>usecase</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gogo.powerrangers</groupId>
+            <artifactId>controller</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gogo.powerrangers</groupId>
+            <artifactId>in-memory-db</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <!-- Unit Test -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-runner</artifactId>
+        </dependency>
+    </dependencies>
+</project>
+```
+
+Aqui podemos verificar que nas dependências temos acesso as outras camadas, agora precisamos criar a classe **Main** que irá executar essa aplicação, mas antes vamos precisar fazer o controle e injeção das dependências, pra vamos criar uma classe de configuração chamada **ManualConfig**:
+```java
+package com.gogo.powerrangers.config;
+
+import com.gogo.powerrangers.db.InMemoryUserRepository;
+import com.gogo.powerrangers.usecase.CreateUser;
+import com.gogo.powerrangers.usecase.SearchUser;
+
+public class ManualConfig {
+
+    private final InMemoryUserRepository dataBase = new InMemoryUserRepository();
+
+    public CreateUser createUser(){
+        return new CreateUser(dataBase);
+    }
+}
+```
+
+Aqui temos a criação da instância do **InMemoryUserRepository** e a injeção dessa dependência na classe **CreateUser** que irá usar essa instância para realizar a persistência.
+
+Vamos criar agora a classe **Main**:
+```java
+package com.gogo.powerrangers;
+
+import com.gogo.powerrangers.config.ManualConfig;
+import com.gogo.powerrangers.model.UserModel;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        var config = new ManualConfig();
+        var createUser = config.createUser();
+        var controller = new UserController(createUser);
+
+        var userModel = new UserModel();
+        userModel.setName(args[0]);
+        userModel.setEmail(args[1]);
+        userModel.setAge(Integer.parseInt(args[2]));
+        userModel.setPersonality(args[3]);
+
+        final var userCreated = controller.createUser(userModel);
+
+        System.out.println(userCreated);
+    }
+}
+```
+
+Se executarmos essa aplicação pelo terminal:
+```
+java -jar target/manual-app-1.0.jar Guilherme fake@mail.com 34 Persistência
+```
+Temos o retorno:
+```
+UserModel{name='Guilherme', email='guiherme@gmail.com', age=34, personality='Persistência', ranger='Verde'}
+```
+
+### Spring Boot e JDBC Template
+Agora vamos fazer a aplicação com um frameworks web e outro pra banco de dados.
+
+Antes de mais nada vamos adicionar ao nosso _pom_ raiz as dependências dos frameworks:
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+    <version>2.3.0.RELEASE</version>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-test</artifactId>
+    <version>2.3.0.RELEASE</version>
+    <scope>test</scope>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.springframework/spring-jdbc -->
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-jdbc</artifactId>
+    <version>5.2.6.RELEASE</version>
+</dependency>
+
+<dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <version>1.4.200</version>
+</dependency>
+```
+Agora vamos usar o **JDBC Template**, vamos então criar um diretório em _repository_ chamado _spring-jdbc_ e vamos criar o nosso _pom.xml_:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>clean-architecture-example</artifactId>
+        <groupId>com.gogo.powerrangers</groupId>
+        <version>1.0</version>
+        <relativePath>../../../../clean-architecture-example/pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>spring-jdbc</artifactId>
+    <version>${revision}</version>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>com.gogo.powerrangers</groupId>
+            <artifactId>entity</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gogo.powerrangers</groupId>
+            <artifactId>usecase</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
+</project>
+```
+O nosso _pom_ agora tem as dependências das camadas da nossa aplicação e a dos drivers e framework jdbc, vamos criar o objeto que será persistido no nosso banco de dados chamado **UserEntity**:
+```java
+package com.gogo.powerrangers.entity;
+
+public class UserEntity {
+
+    private String id;
+    private String name;
+    private String email;
+    private int age;
+    private String personality;
+    private String ranger;
+
+    public static User toUser(UserEntity entity){
+        var user = User.builder().name(entity.getName()).age(entity.getAge())
+                .email(entity.getEmail()).personality(entity.getPersonality()).build();
+
+        return user;
+    }
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public int getAge() {
+		return age;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
+	}
+
+	public String getPersonality() {
+		return personality;
+	}
+
+	public void setPersonality(String personality) {
+		this.personality = personality;
+	}
+
+	public String getRanger() {
+		return ranger;
+	}
+
+	public void setRanger(String ranger) {
+		this.ranger = ranger;
+	}
+
+}
+```
+O **JDBC Template** pede para implementarmos uma interface **RowMapper** que nos auxilia no mapeamento do objeto que retorna do banco para o objeto **UserEntity**:
+```java
+package com.gogo.powerrangers.mapper;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.springframework.jdbc.core.RowMapper;
+
+import com.gogo.powerrangers.entity.UserEntity;
+
+public class UserRowMapper implements RowMapper<UserEntity> {
+
+    @Override
+    public UserEntity mapRow(ResultSet resultSet, int i) throws SQLException {
+
+        UserEntity entity = new UserEntity();
+
+        entity.setId(resultSet.getString("ID"));
+        entity.setAge(resultSet.getInt("AGE"));
+        entity.setEmail(resultSet.getString("EMAIL"));
+        entity.setRanger(resultSet.getString("RANGER"));
+        entity.setName(resultSet.getString("NAME"));
+        entity.setPersonality(resultSet.getString("PERSONALITY"));
+
+        return entity;
+    }
+}
+```
+Agora vamos implementar a nossa **UserRepository** numa classe chamada **SpringJdbcUserRepository**:
+```java
+package com.gogo.powerrangers;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import javax.sql.DataSource;
+
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+
+import com.gogo.powerrangers.entity.User;
+import com.gogo.powerrangers.entity.UserEntity;
+import com.gogo.powerrangers.mapper.UserRowMapper;
+import com.gogo.powerrangers.usecase.port.UserRepository;
+
+public class SpringJdbcUserRepository implements UserRepository {
+	
+	private JdbcTemplate jdbcTemplate;
+    
+    public DataSource dataSource(){
+        return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
+                .addScript("classpath:schema.sql").build();
+    }
+    
+    public JdbcTemplate jdbcTemplate(){
+        return new JdbcTemplate(this.dataSource());
+    }
+    
+    public SpringJdbcUserRepository() {
+    	this.jdbcTemplate = this.jdbcTemplate();
+    }
+
+    @Override
+    public User create(User user) {
+
+        //@formatter:off
+        String sql = new StringBuilder().append("INSERT INTO  ")
+                                        .append(" USER(id, name, age, email, personality, ranger) ")
+                                        .append(" VALUES(?, ?, ?, ?, ?, ?)").toString();
+        //@formatter:on
+
+        jdbcTemplate.update(sql, UUID.randomUUID().toString(), user.getName(), user.getAge(), user.getEmail(), user.getPersonality().getPersonality(), user.getRanger());
+
+        return user;
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+
+        String sql = "SELECT id, name, age, email, personality, ranger FROM USER WHERE email = ?";
+
+        try {
+            UserEntity userEntity = jdbcTemplate.queryForObject(sql, new UserRowMapper(), email);
+
+            User user = UserEntity.toUser(userEntity);
+
+            return Optional.of(user);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<List<User>> findAllUsers() {
+
+        String sql = "SELECT id, name, age, email, personality, ranger FROM USER";
+
+        List<UserEntity> userEntityList = jdbcTemplate.query(sql, new UserRowMapper());
+
+        List<User> userList = userEntityList.stream().map(entity -> {
+            return UserEntity.toUser(entity);
+        }).collect(Collectors.toList());
+
+        return Optional.of(userList);
+    }
+}
+```
+Temos a nossa implementação da parte de persistência de dados e agora precisamos criar a aplicação web com **Spring Boot**.
+
+No diretório _application_ criamos outro diretório chamado _spring-boot_ e dentro dele um arquivo _pom.xml_:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<artifactId>clean-architecture-example</artifactId>
+		<groupId>com.gogo.powerrangers</groupId>
+		<version>1.0</version>
+		<relativePath>../../../clean-architecture-example/pom.xml</relativePath>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>spring-boot</artifactId>
+	<version>${revision}</version>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>11</source>
+					<target>11</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>com.gogo.powerrangers</groupId>
+			<artifactId>entity</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.gogo.powerrangers</groupId>
+			<artifactId>usecase</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.gogo.powerrangers</groupId>
+			<artifactId>controller</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.gogo.powerrangers</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Unit Test -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-launcher</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-runner</artifactId>
+		</dependency>
+	</dependencies>
+</project>
+```
+Aqui temos as dependências das camadas da nossa aplicação e as dependências do framework.
+
+Quando usamos **Spring Boot** precisamos de uma classe principal que chamaremos de **Application**:
+```java
+package com.gogo.powerrangers;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class Application {
+
+    public static void main(String[] args){
+        SpringApplication.run(Application.class, args);
+    }
+}
+```
+Essa classe possui a _annotation_ **@SpringBootApplication** e tudo o que é necessário para uma aplicação **Spring Boot** ser iniciada.
+
+Mas agora precisamos fazer a nossa configuração de injeção de dependências e nisso o **SPring Boot** nos ajuda através dos **Beans**, então vamos criar uma classe de configuração chamada **SpringBootConfig**:
+```java
+package com.gogo.powerrangers.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import com.gogo.powerrangers.SpringJdbcUserRepository;
+import com.gogo.powerrangers.UserController;
+import com.gogo.powerrangers.usecase.CreateUser;
+import com.gogo.powerrangers.usecase.port.UserRepository;
+
+@Configuration
+public class SpringBootConfig {
+
+    @Bean
+    public UserRepository dataBase(){
+        return new SpringJdbcUserRepository();
+    }
+
+    @Bean
+    public CreateUser createUser(){
+        return new CreateUser(this.dataBase());
+    }
+
+    @Bean
+    public UserController userController(){
+        return new UserController(this.createUser();
+    }
+}
+```
+Aqui temos a _annotation_ **@Configuration** que nos auxilia e indica ao Spring que aqui temos os nossos **Beans** que serão processados pelo container do Spring e deixarão esses **Beans** disponíveis para serem injetados na aplicação. Também temos os nosso **Beans** própriamente ditos e prontos para serem usados, então vamos a criação do nosso endpoint com a classe **AddUserController**:
+```java
+package com.gogo.powerrangers.endpoint;
+
+import com.gogo.powerrangers.UserController;
+import com.gogo.powerrangers.model.UserModel;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/powerrangers")
+public class AddUserController {
+
+    @Autowired
+    private UserController userController;
+
+    @PostMapping("add")
+    public ResponseEntity<UserModel> addUser(@RequestBody UserModel userModel){
+        return ResponseEntity.ok(userController.createUser(userModel));
+    }
+}
+```
+Aqui temos a nossa injeção através da _annotation_ **@Autowired** da **UserController** e as declaraçoes necessárias para a criação de um endpoint que recebe um **UserModel** através de um **POST** e faz a criação e persistência desse usuário.
