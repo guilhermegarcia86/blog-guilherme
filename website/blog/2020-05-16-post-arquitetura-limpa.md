@@ -1727,3 +1727,138 @@ Agora vamos criar a nossa aplicação com o framework **VertX**, vamos no diret�
 		</dependency>
 </project>
 ```
+
+Temos as nossas dependências das camadas internas, as dependências do **VertX** e a dependência do _jackson-core_ que nos ajuda com o nosso endpoint. E agora vamos criar a nossa classe de configuração onde teremos a injeção das nossas dependências:
+```java
+package com.gogo.powerrangers.config;
+
+import com.gogo.powerrangers.HibernateUserRepository;
+import com.gogo.powerrangers.usecase.CreateUser;
+import com.gogo.powerrangers.usecase.port.UserRepository;
+
+public class VertxConfig {
+	
+	public final UserRepository repository() {
+		return new HibernateUserRepository();
+	}
+	
+	public final CreateUser createUser() {
+		return new CreateUser(this.repository());
+	}
+}
+```
+
+E criaremos agora o nosso _controller_ que utiliza a instâncai que foi injetada do nosso **UserController**
+```java
+package com.gogo.powerrangers.endpoint;
+
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.json.JsonObject;
+
+public abstract class Controller {
+	
+    public boolean isNull(final Buffer buffer) {
+        return buffer == null || "".equals(buffer.toString());
+    }
+
+    public void sendError(int statusCode, HttpServerResponse response) {
+        response
+                .putHeader("content-type", "application/json")
+                .setStatusCode(statusCode)
+                .end();
+    }
+
+    public void sendSuccess(JsonObject body, HttpServerResponse response) {
+        response
+                .putHeader("content-type", "application/json")
+                .end(body.encodePrettily());
+    }
+
+}
+```
+```java
+package com.gogo.powerrangers.endpoint;
+
+import com.gogo.powerrangers.UserController;
+import com.gogo.powerrangers.model.UserModel;
+
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.RoutingContext;
+
+public class AddUserController extends Controller{
+	
+	private final UserController controller;
+	
+	public AddUserController(UserController controller) {
+        this.controller = controller;
+    }
+	
+	public void createUser(final RoutingContext routingContext) {
+        var response = routingContext.response();
+        var body = routingContext.getBody();
+        if (isNull(body)) {
+            sendError(400, response);
+        } else {
+            var userModel = body.toJsonObject().mapTo(UserModel.class);
+            var user = controller.createUser(userModel);
+            var result = JsonObject.mapFrom(user);
+            sendSuccess(result, response);
+        }
+    }
+
+}
+```
+Temos aqui uma classe abstrata **Controller** que serve apenas como utilitário que outros controllers podem usar.
+
+Agora precisamos o nosso ponto de entrada da aplicação e fazer as configurações do **VertX**:
+```java
+package com.gogo.powerrangers;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.gogo.powerrangers.config.VertxConfig;
+import com.gogo.powerrangers.endpoint.AddUserController;s
+
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Launcher;
+import io.vertx.core.json.Json;
+import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.BodyHandler;
+
+public class VertxApplication extends AbstractVerticle{
+	
+	private final VertxConfig config = new VertxConfig();
+	private final UserController userController = new UserController(config.createUser(), config.searchUser());
+    private final AddUserController addUserController = new AddUserController(userController);
+    
+    @Override
+    public void start() {
+        Json.mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        var router = Router.router(vertx);
+        router.route().handler(BodyHandler.create());
+        router.post("/add").handler(addUserController::createUser);
+
+        vertx.createHttpServer().requestHandler(router::accept).listen(8080);
+    }
+
+    public static void main(String[] args) {
+        Launcher.executeCommand("run", VertxApplication.class.getName());
+    }
+}
+```
+
+Aqui temos as configurações do **VertX** e rotas no método _start_ e o _main_ que é o ponto de entrada.
+
+## Conclusão
+Podemos ver que com esse modelo de arquitetura temos uma aplicação plugável, quer dizer essa aplicação pode usar outras camadas sem que isso tenha impacto direto nas camadas mais internas. Vimos também que o foco está na regra de negócio e a facilidade em fazer testes é maior.
+
+#### Prós
+- Independente de Framework
+- Altamente testável
+- Independente de UI
+- Independente de Banco de Dados
+- Independente de qualquer agente externo
+
+#### Contras
+- Maior curva de aprendizado
+- Mais classes, pacotes e mais sub-projetos
