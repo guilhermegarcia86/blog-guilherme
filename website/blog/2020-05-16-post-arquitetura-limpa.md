@@ -1402,4 +1402,328 @@ public class AddUserController {
     }
 }
 ```
-Aqui temos a nossa injeção através da _annotation_ **@Autowired** da **UserController** e as declaraçoes necessárias para a criação de um endpoint que recebe um **UserModel** através de um **POST** e faz a criação e persistência desse usuário.
+Aqui temos a nossa injeção através da _annotation_ **@Autowired** da **UserController** e as declarações necessárias para a criação de um endpoint que recebe um **UserModel** através de um **POST** e faz a criação e persistência desse usuário.
+
+## VertX e Hibernate
+
+Agora vamos criar uma aplicação com o framework **VertX** e com persistência de dados com o **Hibernate**. Para isso vamos começar com o **Hibernate**, criaremos um diretório dentro de _repository_ com nome _hibernate_ e nele criamos um arquivo _pom.xml_:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<artifactId>clean-architecture-example</artifactId>
+		<groupId>com.gogo.powerrangers</groupId>
+		<version>1.0</version>
+		<relativePath>../../../../clean-architecture-example/pom.xml</relativePath>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>hibernate</artifactId>
+	<version>${revision}</version>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>11</source>
+					<target>11</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>com.gogo.powerrangers</groupId>
+			<artifactId>entity</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.gogo.powerrangers</groupId>
+			<artifactId>usecase</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+		</dependency>
+		
+		<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-core</artifactId>
+			</dependency>
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-jpamodelgen</artifactId>
+			</dependency>
+
+			<!--Compile time JPA API -->
+			<dependency>
+				<groupId>javax.persistence</groupId>
+				<artifactId>javax.persistence-api</artifactId>
+			</dependency>
+
+			<!--Runtime JPA implementation -->
+			<dependency>
+				<groupId>org.eclipse.persistence</groupId>
+				<artifactId>eclipselink</artifactId>
+			</dependency>
+</project>
+```
+
+No nosso _pom_ temos nossas dependências e também adicionamos as dependências que são necessárias para o **Hibernate** funcionar. O **Hibernate** precisa de um arquivo de configuração dentro da pasta **META-INF** em _resources_ chamado _persistence.xml_ e dentro dele ficam as configurações das propriedades que o **Hibernate** usa:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence
+             http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd"
+	version="2.2">
+
+	<persistence-unit name="jpa-h2">
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+		<class>com.gogo.powerrangers.entity.UserEntity</class>
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
+		<properties>
+			<property name="hibernate.show_sql" value="true" />
+			<property name="hibernate.format_sql" value="true" />
+			<property name="javax.persistence.jdbc.driver"
+				value="org.h2.Driver" />
+			<property name="javax.persistence.jdbc.url"
+				value="jdbc:h2:mem:test" />
+			<property name="javax.persistence.jdbc.user" value="sa" />
+			<property name="javax.persistence.jdbc.password" value="" />
+			<property name="hibernate.dialect"
+				value="org.hibernate.dialect.H2Dialect" />
+			<property name="hibernate.hbm2ddl.auto" value="update" />
+			<property name="show_sql" value="true" />
+			<property name="hibernate.temp.use_jdbc_metadata_defaults"
+				value="false" />
+		</properties>
+	</persistence-unit>
+
+</persistence>
+```
+
+Agora precisamos mapear o nosso objeto que vai representar a tabela no banco de dados:
+```java
+package com.gogo.powerrangers.entity;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "USER")
+public class UserEntity {
+	
+	@Id
+	private String id;
+    private String name;
+    private String email;
+    private int age;
+    private String personality;
+    private String ranger;
+    
+    public static User toUser(UserEntity entity) {
+        var user = User.builder().name(entity.getName()).age(entity.getAge())
+                .email(entity.getEmail()).personality(entity.getPersonality()).build();
+
+        return user;
+    }
+    
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public int getAge() {
+		return age;
+	}
+	public void setAge(int age) {
+		this.age = age;
+	}
+	public String getPersonality() {
+		return personality;
+	}
+	public void setPersonality(String personality) {
+		this.personality = personality;
+	}
+	public String getRanger() {
+		return ranger;
+	}
+	public void setRanger(String ranger) {
+		this.ranger = ranger;
+	}
+}
+```
+
+Aqui na **UserEntity** temos todas as anotações necessárias para o **Hibernate**. E agora vamos criar a nossa classe que irá implementar a **UserRepository** que chamaremos de **HibernateUserRepository** onde vamos criar a nossa instância do **EntityManager** para gerenciar as nossas transações com o banco de dados:
+```java
+package com.gogo.powerrangers;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
+import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
+
+import com.gogo.powerrangers.entity.User;
+import com.gogo.powerrangers.entity.UserEntity;
+import com.gogo.powerrangers.usecase.port.UserRepository;
+
+public class HibernateUserRepository implements UserRepository{
+	
+	private EntityManagerFactory emf = null;
+	
+	public HibernateUserRepository() {
+		emf = Persistence.createEntityManagerFactory("jpa-h2");
+	}
+
+	@Override
+	public User create(User user) {
+		EntityManager entityManager = emf.createEntityManager();
+		entityManager.getTransaction().begin();
+		
+		UserEntity entity = new UserEntity();
+		entity.setId(UUID.randomUUID().toString());
+		entity.setName(user.getName());
+		entity.setEmail(user.getEmail());
+		entity.setAge(user.getAge());
+		entity.setPersonality(user.getPersonality().getPersonality());
+		entity.setRanger(user.getRanger());
+		
+		entityManager.persist(entity);
+		entityManager.getTransaction().commit();
+		entityManager.close();
+		
+		return user;
+	}
+
+	@Override
+	public Optional<User> findByEmail(String email) {
+		EntityManager entityManager = emf.createEntityManager();
+		
+		//@formatter:off
+		TypedQuery<UserEntity> query = entityManager.createQuery(new StringBuilder()
+				.append("SELECT user ")
+				.append("	FROM UserEntity user ")
+				.append(" WHERE user.email = :email").toString(), UserEntity.class);
+		// @formatter:on
+		
+		try {
+			UserEntity userEntity = query.setParameter("email", email).getSingleResult();
+			
+			return Optional.of(UserEntity.toUser(userEntity));			
+		} catch (NoResultException e) {
+			return Optional.empty();
+		}
+	}
+
+	@Override
+	public Optional<List<User>> findAllUsers() {
+		EntityManager entityManager = emf.createEntityManager();
+		
+		List<UserEntity> userEntityList = entityManager.createQuery("SELECT user FROM UserEntity user", UserEntity.class).getResultList();
+		
+		List<User> userList = userEntityList.stream().map(UserEntity::toUser).collect(Collectors.toList());
+
+        return Optional.of(userList);
+	}
+	
+}
+```
+
+Agora vamos criar a nossa aplicação com o framework **VertX**, vamos no diretório _application_ e criar uma pasta chamada _vertx_ e adicionar o _pom.xml_:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<artifactId>clean-architecture-example</artifactId>
+		<groupId>com.gogo.powerrangers</groupId>
+		<version>1.0</version>
+		<relativePath>../../../clean-architecture-example/pom.xml</relativePath>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>vertx</artifactId>
+	<version>${revision}</version>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>11</source>
+					<target>11</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>com.gogo.powerrangers</groupId>
+			<artifactId>entity</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.gogo.powerrangers</groupId>
+			<artifactId>usecase</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.gogo.powerrangers</groupId>
+			<artifactId>controller</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/io.vertx/vertx-web -->
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.gogo.powerrangers</groupId>
+			<artifactId>hibernate</artifactId>
+			<version>${revision}</version>
+		</dependency>
+</project>
+```
