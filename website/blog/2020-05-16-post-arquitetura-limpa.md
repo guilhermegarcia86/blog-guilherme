@@ -30,15 +30,15 @@ A ideia é que uma boa arquitetura resolva parafrasenado Robert Martin (Uncle Bo
 
 _"O objetivo da arquitetura de software é minimizar os recursos humanos necessários para construir e manter um determinado sistema."_
 
-A ideia é que com uma boa arquitetura o custo para mudanças não alto, que uma simples mudança não entrave a aplicação.
+A ideia é que com uma boa arquitetura o custo para mudanças não seja alto, que uma simples mudança não entrave a aplicação.
 
 ## Arquitetura limpa
 
-Com esses conceitos em mente por volta de 2012 Robert C. Martin (Uncle Bob) criou a Arquitetura Limpa, um estilo com similaridades com a Arquitetura Cebola ec Arquitetura Hexagonal.
+Com esses conceitos em mente por volta de 2012 Robert C. Martin (Uncle Bob) criou a Arquitetura Limpa, um estilo com similaridades com a Arquitetura Cebola e a Arquitetura Hexagonal.
 
 ### O que resolve?
 
-A arquitetura limpa tem como ideia principal, a modulação das informações que serão codificadas, facilitando a manutenção; os módulos precisam ser independentes o suficiente para que possam ser trabalhados pelos desenvolvedores únicos em equipes diferentes
+A arquitetura limpa tem como ideia principal, a modulação das informações que serão codificadas, facilitando a manutenção; os módulos precisam ser independentes o suficiente para que possam ser trabalhados pelos desenvolvedores em equipes diferentes
 
 - Independência entre componentes, quer dizer cada módulo não conhece o outro, então mudanças em cada módulo não quebram ou necessitam de ajustes nos demais.
 
@@ -74,8 +74,6 @@ A Entidade é a camada mais ao centro e mais alta na Arquitetura Limpa, é aqui 
 
 # Casos de Uso
 Casos de uso contém regras de negócio mais específicas referente à aplicação, ele especifíca a entrada a ser fornecida, a saída a ser retornada e os passos de processamento envolvidos.
-
-_Vale ressaltar que aqui fica claro a ideia de Inversão de Dependência já que os Casos de Uso conhecem e dependem das Entidades mas as Entidades nem conhecem e nem precisam dos Casos de Uso para poderem funcionar._
 
 # Adaptadores de Interface
 Camada que tem como finalidade converter dados da maneira mais acessível e conveniente possível para as camadas Entidades e Casos de Uso. Um exemplo seria o uso de _Mapper's_, onde eu poderia controlar as estruturas transmitidas entre Casos de Uso e Entidades com o interface do usuário, por exemplo.
@@ -1862,3 +1860,5 @@ Podemos ver que com esse modelo de arquitetura temos uma aplicação plugável, 
 #### Contras
 - Maior curva de aprendizado
 - Mais classes, pacotes e mais sub-projetos
+
+[link do projeto](https://github.com/guilhermegarcia86/clean-architecture-example)
