@@ -1402,7 +1402,7 @@ public class AddUserController {
 ```
 Aqui temos a nossa injeção através da _annotation_ **@Autowired** da **UserController** e as declarações necessárias para a criação de um endpoint que recebe um **UserModel** através de um **POST** e faz a criação e persistência desse usuário.
 
-## VertX e Hibernate
+### VertX e Hibernate
 
 Agora vamos criar uma aplicação com o framework **VertX** e com persistência de dados com o **Hibernate**. Para isso vamos começar com o **Hibernate**, criaremos um diretório dentro de _repository_ com nome _hibernate_ e nele criamos um arquivo _pom.xml_:
 ```xml
